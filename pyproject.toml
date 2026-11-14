@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rep-secondaire"
+version = "0.1.0"
+description = "Modélisation TESPy du circuit secondaire d'un REP N4 et effet de la source froide"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "tespy>=0.12,<0.13",
+    "pandas",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
