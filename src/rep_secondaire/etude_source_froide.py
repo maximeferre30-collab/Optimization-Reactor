@@ -20,8 +20,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .parametres import ParametresRankine
+from .parametres import ParametresN4, ParametresRankine
 from .rankine_simple import RankineSimple
+
+
+def creer_modele(params):
+    """Cycle complet N4 si les paramètres sont des ParametresN4, sinon cycle simple."""
+    if isinstance(params, ParametresN4):
+        from .cycle_n4 import CycleN4
+        return CycleN4(params)
+    return RankineSimple(params)
 
 PAS_MAX_K = 1.0
 
@@ -45,7 +53,7 @@ def balayage_temperature(
     params = replace(params) if params else ParametresRankine()
     T_ref = params.T_eau_refroidissement_C
 
-    modele = RankineSimple(params)
+    modele = creer_modele(params)
     modele.resoudre()
     modele.sauvegarder_design(design_path)
 

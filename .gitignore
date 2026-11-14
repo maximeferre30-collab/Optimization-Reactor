@@ -5,4 +5,4 @@ __pycache__/
 .pytest_cache/
 results/*
 !results/.gitkeep
-!results/etude_source_froide.png
+!results/fig*.png

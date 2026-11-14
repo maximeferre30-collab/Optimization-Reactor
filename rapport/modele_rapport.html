@@ -1,0 +1,619 @@
+<title>Circuit secondaire N4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Mise en page : dossier d'étude d'ingénierie, une colonne de lecture, figures pleine largeur, curseur de température collant */
+:root {
+  --bg: #f6f7f8; --surface: #ffffff; --fg: #12161c; --fg-2: #4a5360; --fg-3: #6f7885;
+  --line: #dde1e6; --grid: #e8ebee; --zone: #eceef1; --accent: #1f5fae;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --dome: #9aa1ab;
+  --q1: #cde2fb; --q2: #86b6ef; --q3: #3987e5; --q4: #1c5cab; --q5: #0d366b;
+  --warn-bg: #fff4e0; --warn-fg: #8a5300; --ok: #1baf7a;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121519; --surface: #1a1e23; --fg: #eef1f4; --fg-2: #b7bec8; --fg-3: #8b939e;
+  --line: #2c323a; --grid: #252a31; --zone: #20252b; --accent: #7fb0ec;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --dome: #6d7580;
+  --q1: #184f95; --q2: #256abf; --q3: #3987e5; --q4: #86b6ef; --q5: #cde2fb;
+  --warn-bg: #3a2a10; --warn-fg: #f2c27a; --ok: #199e70; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #121519; --surface: #1a1e23; --fg: #eef1f4; --fg-2: #b7bec8; --fg-3: #8b939e;
+  --line: #2c323a; --grid: #252a31; --zone: #20252b; --accent: #7fb0ec;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --dome: #6d7580;
+  --q1: #184f95; --q2: #256abf; --q3: #3987e5; --q4: #86b6ef; --q5: #cde2fb;
+  --warn-bg: #3a2a10; --warn-fg: #f2c27a; --ok: #199e70; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.55 var(--f-body); margin: 0; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 85%; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-size: 1.55rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 70ch; }
+.eyebrow { font: 600 0.75rem/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+header.hero { display: grid; gap: 14px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.hero .lead { color: var(--fg-2); font-size: 1.1rem; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.9rem; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+section { display: grid; gap: 16px; padding-block: 36px; border-bottom: 1px solid var(--line); scroll-margin-top: 110px; }
+section > p, .prose p { color: var(--fg-2); }
+.prose { display: grid; gap: 10px; align-content: start; }
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.kpi { background: var(--surface); padding: 14px 16px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.kpi .v { font: 600 1.5rem/1.1 var(--f-mono); font-variant-numeric: tabular-nums; }
+.kpi .v small { font-size: 0.85rem; color: var(--fg-2); font-weight: 400; }
+.kpi .l { font-size: 0.83rem; color: var(--fg-2); }
+@media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pilot { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+.pilot-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+.pilot label { font: 600 0.95rem var(--f-body); }
+.pilot input[type=range] { flex: 1 1 260px; accent-color: var(--accent); min-width: 0; }
+.tval { font: 600 1.4rem var(--f-mono); min-width: 5.5ch; }
+.readouts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.88rem; color: var(--fg-2); }
+.readouts b { font: 600 0.92rem var(--f-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+.chip { font: 600 0.75rem var(--f-mono); padding: 3px 8px; border-radius: 999px; background: var(--warn-bg); color: var(--warn-fg); letter-spacing: 0.04em; }
+.fig { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 14px 8px; display: grid; gap: 6px; min-width: 0; position: relative; margin: 0; }
+.fig figcaption { font-size: 0.85rem; color: var(--fg-3); padding-bottom: 6px; }
+.fig .ttl { font: 700 1rem var(--f-display); font-stretch: 85%; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--fg-2); font: 11px var(--f-body); }
+svg .tick { fill: var(--fg-3); font: 10.5px var(--f-mono); }
+svg .lbl { fill: var(--fg); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.85rem; color: var(--fg-2); }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+.legend i.dash { border-top-style: dashed; }
+.legend i.dot { border-top-style: dotted; }
+.legend i.box { height: 10px; border: 0; }
+.tip { position: absolute; pointer-events: none; background: var(--fg); color: var(--bg); font: 12px/1.4 var(--f-mono); padding: 6px 8px; border-radius: 4px; white-space: nowrap; z-index: 3; transform: translate(-50%, calc(-100% - 10px)); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { padding: 7px 12px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+th { font: 600 0.76rem var(--f-mono); color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.05em; }
+td:first-child, th:first-child { text-align: left; }
+td { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+td.txt { font-family: var(--f-body); }
+.pill { font: 600 0.75rem var(--f-mono); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--ok); }
+.pill.w { border-color: var(--s4); }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
+@media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+ul.items { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+ul.items li { display: grid; gap: 2px; min-width: 0; }
+ul.items li b { font-weight: 600; }
+ul.items li span { color: var(--fg-2); font-size: 0.94rem; }
+.formule { font: 0.9rem var(--f-mono); color: var(--fg); background: var(--zone); padding: 8px 10px; border-radius: 4px; overflow-x: auto; }
+footer { padding-top: 24px; color: var(--fg-3); font-size: 0.85rem; display: grid; gap: 6px; }
+input:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">REP palier N4 · circuit secondaire · modèle TESPy</span>
+    <h1>Circuit secondaire N4 et source froide</h1>
+    <p class="lead">Modèle du cycle eau-vapeur complet d'une tranche N4 (4 270 MWth) : turbine HP, sécheur-surchauffeur, turbine BP, six étages de réchauffage, primaire du GV. Il est couplé à une tour aéroréfrigérante et appliqué à dix ans de météo réelle. Question étudiée : comment la température de la source froide modifie-t-elle la puissance produite ?</p>
+    <div class="kpis" id="kpis"></div>
+    <nav class="toc" aria-label="Sommaire">
+      <a href="#resultat">Résultat principal</a><a href="#validation">Validation</a><a href="#cycle">Le cycle</a><a href="#exergie">Exergie</a><a href="#meteo">Météo réelle</a><a href="#rejets">Rejets</a><a href="#incertitudes">Incertitudes</a><a href="#methode">Méthode</a><a href="#hypotheses">Hypothèses</a>
+    </nav>
+  </header>
+
+  <div class="pilot" role="group" aria-labelledby="pilot-lbl">
+    <div class="pilot-row">
+      <label id="pilot-lbl" for="teau">Température d'entrée de l'eau au condenseur</label>
+      <input type="range" id="teau" min="0" max="35" step="1" value="15">
+      <span class="tval" id="tval">15 °C</span>
+      <span class="chip" id="chip" hidden>ÉCHAPPEMENT BLOQUÉ</span>
+    </div>
+    <div class="readouts" id="readouts"></div>
+  </div>
+
+  <section id="resultat">
+    <span class="eyebrow">Résultat principal</span>
+    <h2>La puissance passe par un maximum, puis baisse avec l'eau chaude</h2>
+    <p id="txt-resultat"></p>
+    <figure class="fig">
+      <div class="ttl">Puissance électrique nette (MWe)</div>
+      <div class="legend"><span><i style="border-color:var(--s1)"></i>cycle N4 complet</span><span><i class="dash" style="border-color:var(--s2)"></i>N4 sans pertes d'échappement</span><span><i class="dot" style="border-color:var(--s3)"></i>cycle simple (étapes 1 à 3)</span><span><i class="box" style="background:var(--zone)"></i>écoulement bloqué</span></div>
+      <div id="ch-p"></div>
+      <figcaption>Survolez pour lire les valeurs. La ligne verticale suit le curseur.</figcaption>
+    </figure>
+    <div class="grid2">
+      <figure class="fig"><div class="ttl">Pression au condenseur (mbar)</div><div id="ch-pc"></div></figure>
+      <figure class="fig"><div class="ttl">Perte d'échappement BP (MW)</div><div id="ch-ech"></div></figure>
+    </div>
+  </section>
+
+  <section id="validation">
+    <span class="eyebrow">Confiance dans le modèle</span>
+    <h2>Validation contre les données publiques du N4</h2>
+    <p>Le modèle n'est pas calé : ses paramètres sont des valeurs d'ingénierie usuelles. L'écart à la puissance brute publiée s'explique par ce que le modèle ignore (fuites aux garnitures, purges des GV, vapeur auxiliaire, pertes de charge des soutirages).</p>
+    <div class="tablewrap"><table id="tab-valid"></table></div>
+  </section>
+
+  <section id="cycle">
+    <span class="eyebrow">Thermodynamique</span>
+    <h2>Le cycle N4 complet</h2>
+    <figure class="fig"><div class="ttl">Schéma du circuit modélisé</div><div id="schema"></div><figcaption>HP : 3 tronçons séparés par 2 soutirages. BP : 4 tronçons séparés par 3 soutirages. Purges en cascade vers la bâche (côté HP) et vers le condenseur (côté BP).</figcaption></figure>
+    <figure class="fig">
+      <div class="ttl">Diagramme T-s, eau à 15 °C</div>
+      <div class="legend"><span><i style="border-color:var(--s1)"></i>cycle N4 complet</span><span><i class="dash" style="border-color:var(--s2)"></i>cycle simple</span><span><i style="border-color:var(--dome)"></i>saturation</span></div>
+      <div id="ch-ts"></div>
+      <figcaption>Le sécheur ramène la vapeur sur la courbe de saturation, puis le surchauffeur l'en éloigne avant la BP. L'eau alimentaire est réchauffée par paliers jusqu'à 231 °C : c'est ce qui fait gagner 5 points de rendement par rapport au cycle simple.</figcaption>
+    </figure>
+    <div class="grid2">
+      <figure class="fig"><div class="ttl">Bilan d'énergie au design</div><div id="sankey"></div></figure>
+      <div class="tablewrap"><table id="tab-etats"></table></div>
+    </div>
+  </section>
+
+  <section id="exergie">
+    <span class="eyebrow">Second principe</span>
+    <h2>Où se perd la capacité à produire du travail</h2>
+    <p id="txt-exergie"></p>
+    <figure class="fig"><div class="ttl">Exergie détruite ou rejetée, par composant (MW)</div><div id="ch-ex"></div></figure>
+  </section>
+
+  <section id="meteo">
+    <span class="eyebrow">Météo réelle 2015-2024</span>
+    <h2>De l'air extérieur à la puissance, heure par heure</h2>
+    <p>Les tranches N4 sont refroidies par des tours à tirage naturel. La température de l'eau froide dépend donc de l'air : sa température, et surtout son humidité. Chaîne de calcul pour chacune des 87 672 heures : air (réanalyse ERA5) → tour (Merkel + tirage naturel) → température d'eau au condenseur → puissance (cycle N4 hors dimensionnement).</p>
+    <div class="kpis" id="kpis-annuel" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+    <figure class="fig">
+      <div class="ttl">Puissance nette moyenne par mois (MWe)</div>
+      <div class="legend"><span><i style="border-color:var(--s1)"></i>Chooz</span><span><i class="dot" style="border-color:var(--s3)"></i>Civaux</span><span><i class="dash" style="border-color:var(--s2)"></i>Chooz, climat +2 °C</span><span><i class="box" style="background:var(--q1)"></i>Chooz, 5e-95e centile horaire</span></div>
+      <div id="ch-mois"></div>
+    </figure>
+    <figure class="fig">
+      <div class="ttl">Chooz : puissance nette jour par jour</div>
+      <div id="carte"></div>
+      <figcaption>Chaque case est une journée (moyenne de 24 h). L'échelle de couleur est à droite. Les étés chauds se lisent directement en bandes verticales ; survolez une case pour la date et la valeur.</figcaption>
+    </figure>
+  </section>
+
+  <section id="rejets">
+    <span class="eyebrow">Réglementation</span>
+    <h2>Variante en circuit ouvert : les limites de rejet</h2>
+    <p>Avec une tour, la chaleur part dans l'air et la limite de rejet en rivière pèse peu. Si la même tranche était refroidie directement par la rivière, sa chaleur (≈ 2 600 MW) réchaufferait le cours d'eau, et l'arrêté de rejet imposerait des baisses de puissance. La carte donne la puissance admise selon le débit et la température de la rivière, avec des limites illustratives : échauffement ≤ 3 K et température aval ≤ 28 °C. Chaque site a ses propres valeurs.</p>
+    <figure class="fig"><div class="ttl">Puissance nette admissible (MWe)</div><div id="ch-rej"></div><figcaption>Survolez une case pour lire la valeur. Échelle des débits logarithmique.</figcaption></figure>
+  </section>
+
+  <section id="incertitudes">
+    <span class="eyebrow">Rigueur</span>
+    <h2>Ce que valent ces chiffres : propagation des incertitudes</h2>
+    <p id="txt-inc"></p>
+    <div class="grid2">
+      <figure class="fig"><div class="ttl">Puissance nette, médiane et intervalle 5-95 % (MWe)</div><div id="ch-inc"></div></figure>
+      <figure class="fig"><div class="ttl">Tornade : écart de pente au cas nominal (MWe/°C)</div><div class="legend"><span><i class="box" style="background:var(--s2)"></i>borne basse</span><span><i class="box" style="background:var(--s1)"></i>borne haute</span></div><div id="ch-tor"></div></figure>
+    </div>
+  </section>
+
+  <section id="methode">
+    <span class="eyebrow">Méthode</span>
+    <h2>Les trois modèles physiques ajoutés au cycle</h2>
+    <div class="grid2">
+      <div class="prose">
+        <h3>Pertes d'échappement BP (Spencer-Cotton-Cannon)</h3>
+        <p class="formule">h_UEEP = h_ELEP + EL(V) · 0,87 · (1 − 0,01 Y) · (1 − 0,0065 Y)</p>
+        <p>V est la vitesse axiale de sortie, avec une section fixée pour 250 m/s au design. L'écoulement est bloqué au-delà de 400 m/s. La courbe EL(V) est générique, car les courbes constructeur ne sont pas publiques.</p>
+        <h3>Humidité dans la turbine (Baumann)</h3>
+        <p class="formule">η = η_sec · (1 − a · y_moy), a = 1</p>
+        <h3>Condenseur et tour</h3>
+        <p>Le UA du condenseur est corrigé selon la température de l'eau (Dittus-Boelter côté tubes). Tour : intégrale de Merkel (Tchebychev 4 points, CTI) et tirage naturel (L/G)²·Δρ = constante.</p>
+      </div>
+      <figure class="fig"><div class="ttl">Courbe EL(V) et point de fonctionnement</div><div id="ch-el"></div><figcaption>Le point suit le curseur de température.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="hypotheses">
+    <span class="eyebrow">Transparence</span>
+    <h2>Hypothèses, vérifications, limites</h2>
+    <div class="cols">
+      <div class="prose"><h3>Hypothèses</h3><ul class="items" id="hyp"></ul></div>
+      <div class="prose"><h3>Vérifications automatiques (pytest)</h3><ul class="items" id="verif"></ul><h3 style="margin-top:12px">Limites connues</h3><ul class="items" id="limites"></ul></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Généré par <span class="mono">scripts/rapport_html.py</span> à partir de <span class="mono">results/rapport_donnees.json</span>. Eau et air humide : CoolProp (IAPWS-95). Solveur : TESPy 0.12. Météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0).</span>
+  </footer>
+</div>
+
+<script>
+const D = /*__DONNEES__*/null;
+const fr = (v, d = 0) => v == null || Number.isNaN(+v) ? "—" : Number(v).toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const B = D.balayage, T = B.T, Dz = D.design, S = D.synthese;
+const iT = (t) => T.findIndex((x) => Math.abs(x - t) < 1e-9);
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((s) => span / s <= n + 0.5);
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function tipAt(host, x, y, html) { const t = host.querySelector(".tip"); t.hidden = false; t.style.left = `${x}px`; t.style.top = `${y}px`; t.innerHTML = html; }
+function tipOff(host) { host.querySelector(".tip").hidden = true; }
+
+/* ---------- courbes (x commun), bande optionnelle ---------- */
+function lineChart(host, o) {
+  const W = o.w || 680, H = o.h || 290, m = { l: 54, r: 14, t: 12, b: 38 };
+  const xs = o.x, x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const allY = o.series.flatMap((s) => s.y).concat(o.band ? o.band.lo.concat(o.band.hi) : []);
+  let y0 = o.ymin ?? Math.min(...allY), y1 = Math.max(...allY);
+  const pad = (y1 - y0) * 0.08; y0 = o.ymin ?? y0 - pad; y1 += pad;
+  const X = (v) => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+  const Y = (v) => H - m.b - (v - y0) / (y1 - y0) * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+  if (o.shadeTo != null) s += `<rect x="${X(x0)}" y="${m.t}" width="${X(o.shadeTo) - X(x0)}" height="${H - m.t - m.b}" fill="var(--zone)"/>`;
+  for (const t of niceTicks(y0, y1)) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text class="tick" x="${m.l - 8}" y="${Y(t) + 3.5}" text-anchor="end">${fr(t, o.yd || 0)}</text>`;
+  for (const t of (o.xticks || niceTicks(x0, x1, 7))) s += `<text class="tick" x="${X(t)}" y="${H - m.b + 16}" text-anchor="middle">${o.xfmt ? o.xfmt(t) : fr(t)}</text>`;
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--line)"/>`;
+  if (o.xlabel) s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle">${esc(o.xlabel)}</text>`;
+  if (o.band) {
+    const up = o.band.hi.map((v, i) => `${X(xs[i]).toFixed(1)},${Y(v).toFixed(1)}`), dn = o.band.lo.map((v, i) => `${X(xs[i]).toFixed(1)},${Y(v).toFixed(1)}`).reverse();
+    s += `<polygon points="${up.concat(dn).join(" ")}" fill="var(${o.band.c})" fill-opacity="0.18"/>`;
+  }
+  for (const se of o.series) {
+    const d = se.y.map((v, i) => `${i ? "L" : "M"}${X(xs[i]).toFixed(1)},${Y(v).toFixed(1)}`).join("");
+    const dash = se.dash === "dash" ? 'stroke-dasharray="7 4"' : se.dash === "dot" ? 'stroke-dasharray="2 4" stroke-linecap="round"' : "";
+    s += `<path d="${d}" fill="none" stroke="var(${se.c})" stroke-width="2.2" ${dash} stroke-linejoin="round"/>`;
+    if (se.markers) se.y.forEach((v, i) => { s += `<circle cx="${X(xs[i])}" cy="${Y(v)}" r="3.5" fill="var(${se.c})"/>`; });
+  }
+  if (o.annot) s += o.annot(X, Y);
+  s += `<line class="mk" x1="-99" x2="-99" y1="${m.t}" y2="${H - m.b}" stroke="var(--fg-3)" stroke-dasharray="3 3"/>`;
+  s += `<g class="hv" visibility="hidden"><line class="hx" y1="${m.t}" y2="${H - m.b}" stroke="var(--fg-2)"/>${o.series.map((se) => `<circle r="4.5" fill="var(${se.c})" stroke="var(--surface)" stroke-width="2"/>`).join("")}</g>`;
+  s += `<rect class="hit" x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent"/></svg><div class="tip" hidden></div>`;
+  host.innerHTML = s; host.style.position = "relative";
+  const svg = host.querySelector("svg"), hv = svg.querySelector(".hv"), hit = svg.querySelector(".hit");
+  const show = (ev) => {
+    const r = svg.getBoundingClientRect(), k = W / r.width;
+    const xv = x0 + ((ev.clientX - r.left) * k - m.l) / (W - m.l - m.r) * (x1 - x0);
+    let i = 0; xs.forEach((v, j) => { if (Math.abs(v - xv) < Math.abs(xs[i] - xv)) i = j; });
+    hv.setAttribute("visibility", "visible");
+    hv.querySelector(".hx").setAttribute("x1", X(xs[i])); hv.querySelector(".hx").setAttribute("x2", X(xs[i]));
+    hv.querySelectorAll("circle").forEach((c, j) => { c.setAttribute("cx", X(xs[i])); c.setAttribute("cy", Y(o.series[j].y[i])); });
+    const head = o.xfmt ? o.xfmt(xs[i]) : `${fr(xs[i])} °C`;
+    const ymin = Math.min(...o.series.map((se) => Y(se.y[i])));
+    tipAt(host, X(xs[i]) / k, ymin / k, `${head}<br>` + o.series.map((se) => `${esc(se.n)} : ${fr(se.y[i], o.td ?? 1)} ${o.unit}`).join("<br>") + (o.band ? `<br>5-95 % : ${fr(o.band.lo[i], 0)} – ${fr(o.band.hi[i], 0)}` : ""));
+  };
+  hit.addEventListener("pointermove", show); hit.addEventListener("pointerdown", show);
+  hit.addEventListener("pointerleave", () => { hv.setAttribute("visibility", "hidden"); tipOff(host); });
+  return { setMarker: (t) => { const mk = svg.querySelector(".mk"); mk.setAttribute("x1", X(t)); mk.setAttribute("x2", X(t)); } };
+}
+
+/* ---------- barres horizontales ---------- */
+function barH(host, rows, o) {
+  const W = 680, rowH = 30, m = { l: o.ml || 250, r: 130, t: 6, b: 26 }, H = m.t + m.b + rows.length * rowH;
+  const vals = rows.flatMap((r) => r.v.map ? r.v : [r.v]);
+  const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+  const X = (v) => m.l + (v - lo) / (hi - lo || 1) * (W - m.l - m.r);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+  for (const t of niceTicks(lo, hi, 5)) s += `<line x1="${X(t)}" x2="${X(t)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--grid)"/><text class="tick" x="${X(t)}" y="${H - 8}" text-anchor="middle">${fr(t, o.td || 0)}</text>`;
+  rows.forEach((r, i) => {
+    const y = m.t + i * rowH;
+    s += `<text x="${m.l - 10}" y="${y + rowH / 2 + 4}" text-anchor="end">${esc(r.n)}</text>`;
+    const parts = r.v.map ? r.v.map((v, j) => [v, r.c[j]]) : [[r.v, r.c]];
+    for (const [v, c] of parts) {
+      const xa = X(Math.min(0, v)), w = Math.abs(X(v) - X(0));
+      s += `<rect class="bar" data-i="${i}" x="${xa}" y="${y + 6}" width="${Math.max(w, 1)}" height="${rowH - 12}" rx="2" fill="var(${c})"/>`;
+    }
+    if (r.lab) s += `<text class="tick" x="${X(Math.max(0, ...(r.v.map ? r.v : [r.v]))) + 6}" y="${y + rowH / 2 + 4}">${esc(r.lab)}</text>`;
+  });
+  s += `<line x1="${X(0)}" x2="${X(0)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--fg-3)"/></svg><div class="tip" hidden></div>`;
+  host.innerHTML = s; host.style.position = "relative";
+  host.querySelectorAll(".bar").forEach((b) => {
+    b.addEventListener("pointermove", (ev) => { const r = host.getBoundingClientRect(); tipAt(host, ev.clientX - r.left, ev.clientY - r.top, esc(rows[+b.dataset.i].tip)); });
+    b.addEventListener("pointerleave", () => tipOff(host));
+  });
+}
+
+/* ---------- carte de chaleur ---------- */
+function rampe(t) { // rampe séquentielle bleue (5 pas), interpolée
+  const cs = ["--q1", "--q2", "--q3", "--q4", "--q5"].map((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim());
+  const hex = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16));
+  const u = Math.min(Math.max(t, 0), 1) * 4, i = Math.min(Math.floor(u), 3), f = u - i, a = hex(cs[i]), b = hex(cs[i + 1]);
+  return `rgb(${a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(",")})`;
+}
+function heatmap(host, Z, o) {
+  const nr = Z.length, nc = Z[0].length, W = o.w || 900, m = { l: o.ml || 44, r: 70, t: 6, b: 30 };
+  const cw = (W - m.l - m.r) / nc, ch = o.ch || 18, H = m.t + m.b + nr * ch;
+  const flat = Z.flat().filter((v) => v != null), lo = o.lo ?? Math.min(...flat), hi = o.hi ?? Math.max(...flat);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}" shape-rendering="crispEdges">`;
+  Z.forEach((row, i) => row.forEach((v, j) => { if (v != null) s += `<rect x="${(m.l + j * cw).toFixed(2)}" y="${m.t + i * ch}" width="${(cw + 0.6).toFixed(2)}" height="${ch - (o.gap ?? 1)}" fill="${rampe((v - lo) / (hi - lo))}"/>`; }));
+  o.rows.forEach((r, i) => { s += `<text class="tick" x="${m.l - 6}" y="${m.t + i * ch + ch / 2 + 3}" text-anchor="end">${esc(r)}</text>`; });
+  (o.cticks || []).forEach(([j, lab]) => { s += `<text class="tick" x="${m.l + j * cw}" y="${H - 10}">${esc(lab)}</text>`; });
+  if (o.xlabel) s += `<text x="${(m.l + W - m.r) / 2}" y="${H}" text-anchor="middle">${esc(o.xlabel)}</text>`;
+  const gx = W - m.r + 14, gh = nr * ch;
+  for (let k = 0; k < 40; k++) s += `<rect x="${gx}" y="${m.t + gh - (k + 1) * gh / 40}" width="12" height="${gh / 40 + 0.5}" fill="${rampe(k / 39)}"/>`;
+  s += `<text class="tick" x="${gx + 16}" y="${m.t + 9}">${fr(hi)}</text><text class="tick" x="${gx + 16}" y="${m.t + gh}">${fr(lo)}</text>`;
+  s += `<rect class="hit" x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${nr * ch}" fill="transparent"/></svg><div class="tip" hidden></div>`;
+  host.innerHTML = s; host.style.position = "relative";
+  const svg = host.querySelector("svg");
+  svg.querySelector(".hit").addEventListener("pointermove", (ev) => {
+    const r = svg.getBoundingClientRect(), k = W / r.width, x = (ev.clientX - r.left) * k, y = (ev.clientY - r.top) * k;
+    const j = Math.floor((x - m.l) / cw), i = Math.floor((y - m.t) / ch);
+    if (i < 0 || j < 0 || i >= nr || j >= nc || Z[i][j] == null) { tipOff(host); return; }
+    tipAt(host, ev.clientX - svg.getBoundingClientRect().left, ev.clientY - svg.getBoundingClientRect().top, o.tip(i, j, Z[i][j]));
+  });
+  svg.querySelector(".hit").addEventListener("pointerleave", () => tipOff(host));
+}
+
+/* ---------- chiffres clés ---------- */
+const A = D.annuel || {};
+document.getElementById("kpis").innerHTML = [
+  [fr(Dz.puissance_electrique_brute_MW), "MWe", "puissance brute au design (eau à 15 °C)"],
+  [fr(100 * Dz.rendement_cycle, 1), "%", `rendement du cycle (Carnot ${fr(100 * Dz.rendement_carnot, 1)} %)`],
+  [fr(S.P_optimum), "MWe", `puissance nette maximale, eau à ${fr(S.T_optimum)} °C`],
+  [fr(S.pente_au_dessus_design, 1), "MWe/°C", `au-dessus de 15 °C (${fr(100 * S.pente_au_dessus_design / Dz.puissance_electrique_nette_MW, 2)} %/°C)`],
+  A.chooz ? [fr(A.chooz.energie_moyenne_TWh, 2), "TWh/an", "production nette à Chooz, météo 2015-2024, à pleine puissance"] : ["—", "", "météo non calculée"],
+].map(([v, u, l]) => `<div class="kpi"><span class="v">${v} <small>${u}</small></span><span class="l">${l}</span></div>`).join("");
+
+const blocage = S.T_max_blocage;
+document.getElementById("txt-resultat").textContent =
+  `Avec le cycle N4 complet, la puissance nette culmine à ${fr(S.P_optimum)} MWe pour une eau à ${fr(S.T_optimum)} °C. Au-dessus de 15 °C, chaque degré coûte ${fr(-S.pente_au_dessus_design, 1)} MWe, contre ${fr(-S.pente_simple, 1)} MWe pour le cycle simple. ` +
+  (blocage != null ? `En dessous de ${fr(blocage + 1)} °C, l'écoulement en sortie de turbine BP est bloqué : creuser le vide n'apporte plus rien. ` : "") +
+  `Contrairement au cycle simple, la puissance ne baisse pas dans la zone bloquée : les soutirages réchauffent le condensat froid.`;
+
+const shade = blocage != null ? blocage + 0.5 : null;
+const chP = lineChart(document.getElementById("ch-p"), {
+  aria: "Puissance électrique nette en fonction de la température de l'eau", x: T, h: 300, unit: "MWe", td: 0,
+  xlabel: "Température d'entrée de l'eau au condenseur (°C)", shadeTo: shade,
+  series: [{ n: "N4 complet", y: B.puissance_electrique_nette_MW, c: "--s1" },
+           { n: "N4 sans pertes éch.", y: D.balayage_sans_pertes.puissance_electrique_nette_MW, c: "--s2", dash: "dash" },
+           { n: "cycle simple", y: D.balayage_simple.puissance_electrique_nette_MW, c: "--s3", dash: "dot" }],
+  annot: (X, Y) => `<circle cx="${X(S.T_optimum)}" cy="${Y(S.P_optimum)}" r="5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="lbl" x="${X(S.T_optimum) + 8}" y="${Y(S.P_optimum) - 10}">optimum ${fr(S.T_optimum)} °C · ${fr(S.P_optimum)} MWe</text>`,
+});
+const chPc = lineChart(document.getElementById("ch-pc"), { aria: "Pression au condenseur", x: T, w: 420, h: 250, unit: "mbar", td: 1, shadeTo: shade, ymin: 0, xlabel: "T eau (°C)", series: [{ n: "p condenseur", y: B.p_condenseur_mbar, c: "--s1" }] });
+const chE = lineChart(document.getElementById("ch-ech"), { aria: "Perte d'échappement", x: T, w: 420, h: 250, unit: "MW", td: 1, shadeTo: shade, ymin: 0, xlabel: "T eau (°C)", series: [{ n: "perte", y: B.perte_echappement_MW, c: "--s1" }] });
+
+/* ---------- validation ---------- */
+(function () {
+  const lib = { puissance_electrique_brute_MW: ["Puissance électrique brute", "MWe", 0], T_eau_alimentaire_C: ["Température d'eau alimentaire", "°C", 1], p_vapeur_bar: ["Pression vapeur sortie GV", "bar", 1], debit_vapeur_kg_s: ["Débit de vapeur (4 GV)", "kg/s", 0] };
+  document.getElementById("tab-valid").innerHTML = `<thead><tr><th>grandeur</th><th>modèle</th><th>ordre de grandeur publié</th><th>écart</th><th></th></tr></thead><tbody>` +
+    Object.entries(D.validation).map(([k, v]) => { const [n, u, d] = lib[k]; const ok = Math.abs(v.ecart_pct) < 3; return `<tr><td class="txt">${n}</td><td>${fr(v.modele, d)} ${u}</td><td>≈ ${fr(v.public, d)} ${u}</td><td>${v.ecart_pct >= 0 ? "+" : "−"}${fr(Math.abs(v.ecart_pct), 1)} %</td><td><span class="pill ${ok ? "" : "w"}">${ok ? "cohérent" : "écart"}</span></td></tr>`; }).join("") + `</tbody>`;
+})();
+
+/* ---------- schéma du N4 ---------- */
+(function () {
+  const W = 940, H = 420;
+  const bx = (x, y, w, h, t, sub) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="var(--surface)" stroke="var(--fg-2)" stroke-width="1.4"/><text class="lbl" x="${x + w / 2}" y="${y + h / 2 + (sub ? -2 : 4)}" text-anchor="middle">${t}</text>${sub ? `<text x="${x + w / 2}" y="${y + h / 2 + 13}" text-anchor="middle">${sub}</text>` : ""}`;
+  const tu = (x, y, w, t, sub) => `<path d="M${x},${y + 14} L${x + w},${y} L${x + w},${y + 80} L${x},${y + 66} Z" fill="var(--surface)" stroke="var(--fg-2)" stroke-width="1.4"/><text class="lbl" x="${x + w / 2}" y="${y + 40}" text-anchor="middle">${t}</text><text x="${x + w / 2}" y="${y + 55}" text-anchor="middle">${sub}</text>`;
+  const ln = (d, c = "--fg-2", dash) => `<path d="${d}" fill="none" stroke="var(${c})" stroke-width="1.8" ${dash ? 'stroke-dasharray="4 3"' : ""} marker-end="url(#fl)"/>`;
+  const P = D.parametres.p_soutirages_bar;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Schéma du circuit secondaire N4 modélisé"><defs><marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--fg-2)"/></marker></defs>`;
+  s += bx(20, 30, 110, 80, "GV ×4", `${fr(Dz.puissance_thermique_MW)} MW`);
+  s += `<text x="75" y="22" text-anchor="middle">primaire ${fr(D.parametres.T_primaire_chaud_C)} → ${fr(D.parametres.T_primaire_froid_C)} °C</text>`;
+  s += tu(190, 30, 110, "Turbine HP", `${fr(Dz.puissance_HP_MW)} MW`);
+  s += bx(350, 40, 120, 60, "Sécheur-", "surchauffeur");
+  s += tu(520, 30, 140, "Turbine BP", `${fr(Dz.puissance_BP_MW)} MW`);
+  s += `<line x1="660" y1="70" x2="720" y2="70" stroke="var(--fg-2)" stroke-width="3"/><circle cx="745" cy="70" r="24" fill="var(--surface)" stroke="var(--fg-2)" stroke-width="1.4"/><text class="lbl" x="745" y="74" text-anchor="middle">G</text><text x="745" y="112" text-anchor="middle">${fr(Dz.puissance_electrique_brute_MW)} MWe</text>`;
+  s += bx(560, 200, 120, 60, "Condenseur", `${fr(Dz.p_condenseur_mbar, 1)} mbar`);
+  s += bx(730, 200, 110, 60, "Tour", "aéroréfrigérante");
+  s += bx(470, 320, 70, 44, "RBP1", `${fr(P.RBP1, 1)} bar`); s += bx(380, 320, 70, 44, "RBP2", `${fr(P.RBP2, 1)} bar`); s += bx(290, 320, 70, 44, "RBP3", `${fr(P.RBP3)} bar`);
+  s += bx(180, 310, 90, 64, "Bâche", `${fr(P.bache)} bar`);
+  s += bx(100, 200, 60, 44, "RHP1", `${fr(P.RHP1)} bar`); s += bx(20, 200, 60, 44, "RHP2", `${fr(P.RHP2)} bar`);
+  s += ln("M130,60 L190,60") + ln("M300,70 L350,70") + ln("M470,70 L520,70") + ln("M620,110 L620,200");
+  s += ln("M680,222 L730,222", "--s2") + ln("M730,242 L680,242", "--s1");
+  s += ln("M590,260 L590,342 L540,342") + ln("M470,342 L450,342") + ln("M380,342 L360,342") + ln("M290,342 L270,342");
+  s += ln("M180,342 L130,342 L130,244") + ln("M100,222 L80,222") + ln("M50,200 L50,110");
+  s += `<text x="140" y="300">pompe alim.</text><text x="560" y="300">pompe extr.</text>`;
+  s += ln("M220,110 L220,180 L50,180 L50,200", "--s4", true) + ln("M260,110 L260,170 L130,170 L130,200", "--s4", true);
+  s += ln("M300,90 L300,140 L225,140 L225,310", "--s4", true);
+  s += ln("M560,100 L560,140 L325,140 L325,320", "--s4", true) + ln("M600,105 L600,150 L415,150 L415,320", "--s4", true) + ln("M640,108 L640,160 L505,160 L505,320", "--s4", true);
+  s += `<text x="${W - 10}" y="${H - 8}" text-anchor="end">pointillés : soutirages · flèches pleines : eau et vapeur principales</text></svg>`;
+  document.getElementById("schema").innerHTML = s;
+})();
+
+/* ---------- T-s ---------- */
+(function () {
+  const W = 940, H = 520, m = { l: 52, r: 16, t: 12, b: 42 }, s0 = 0, s1 = 8, T0 = 0, T1 = 380;
+  const X = (v) => m.l + (v - s0) / (s1 - s0) * (W - m.l - m.r), Y = (v) => H - m.b - (v - T0) / (T1 - T0) * (H - m.t - m.b);
+  const poly = (sa, Ta) => sa.map((v, i) => `${X(v).toFixed(1)},${Y(Ta[i]).toFixed(1)}`).join(" ");
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramme température-entropie du cycle N4">`;
+  for (const t of [0, 50, 100, 150, 200, 250, 300, 350]) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text class="tick" x="${m.l - 8}" y="${Y(t) + 3.5}" text-anchor="end">${t}</text>`;
+  for (const t of [0, 1, 2, 3, 4, 5, 6, 7, 8]) s += `<text class="tick" x="${X(t)}" y="${H - m.b + 16}" text-anchor="middle">${t}</text>`;
+  s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 6}" text-anchor="middle">Entropie massique s (kJ/kg/K)</text><text x="14" y="${m.t + 4}" transform="rotate(-90 14 ${m.t + 4})" text-anchor="end">Température T (°C)</text>`;
+  s += `<polyline points="${poly(D.Ts.cloche.s, D.Ts.cloche.T)}" fill="none" stroke="var(--dome)" stroke-width="1.3"/>`;
+  for (const g of Object.values(D.Ts.simple.segments)) s += `<polyline points="${poly(g.s, g.T)}" fill="none" stroke="var(--s2)" stroke-width="1.6" stroke-dasharray="6 4"/>`;
+  for (const g of Object.values(D.Ts.n4.segments)) s += `<polyline points="${poly(g.s, g.T)}" fill="none" stroke="var(--s1)" stroke-width="2.3" stroke-linejoin="round"/>`;
+  const lib = { "1": ["vapeur vive", 8, -6], e3: ["échappement HP", 8, 14], v_sech: ["sortie sécheur", 8, -6], bp_in: ["entrée BP", 8, -6], "2": ["fin de détente", 8, -6], "3": ["condensat", -10, -10], a0: ["bâche", -46, -6], "4": ["eau alimentaire", -100, -4] };
+  const pts = [];
+  for (const [k, [sv, Tv]] of Object.entries(D.Ts.n4.points)) {
+    pts.push([lib[k][0], sv, Tv]);
+    s += `<circle cx="${X(sv)}" cy="${Y(Tv)}" r="5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="lbl" x="${X(sv) + lib[k][1]}" y="${Y(Tv) + lib[k][2]}">${lib[k][0]}</text>`;
+  }
+  s += `<rect class="hit" x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent"/></svg><div class="tip" hidden></div>`;
+  const host = document.getElementById("ch-ts"); host.innerHTML = s; host.style.position = "relative";
+  const svg = host.querySelector("svg");
+  svg.querySelector(".hit").addEventListener("pointermove", (ev) => {
+    const r = svg.getBoundingClientRect(), k = W / r.width, px = (ev.clientX - r.left) * k, py = (ev.clientY - r.top) * k;
+    let best = null, bd = 24; for (const p of pts) { const d = Math.hypot(X(p[1]) - px, Y(p[2]) - py); if (d < bd) { bd = d; best = p; } }
+    if (!best) { tipOff(host); return; }
+    tipAt(host, X(best[1]) / k, Y(best[2]) / k, `${esc(best[0])}<br>s ${fr(best[1], 3)} kJ/kg/K · T ${fr(best[2], 1)} °C`);
+  });
+  svg.querySelector(".hit").addEventListener("pointerleave", () => tipOff(host));
+})();
+
+/* ---------- Sankey ---------- */
+(function () {
+  const b = D.bilan, Q = b["Puissance GV"];
+  const out = [["Électricité nette", "--s1"], ["Chaleur rejetée au condenseur", "--s2"], ["Pertes d'échappement BP (rejetées au condenseur)", "--s3"], ["Pertes alternateur + moteur de pompe", "--s4"]];
+  const W = 560, H = 360, x0 = 120, x1 = 330, top = 16, Hs = 290, gap = 16, k = Hs / Q;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bilan d'énergie du cycle N4">`;
+  s += `<rect x="${x0 - 10}" y="${top}" width="10" height="${Hs}" fill="var(--fg-2)"/><text class="lbl" x="${x0 - 16}" y="${top + Hs / 2 - 4}" text-anchor="end">GV</text><text class="tick" x="${x0 - 16}" y="${top + Hs / 2 + 12}" text-anchor="end">${fr(Q)} MW</text>`;
+  let yl = top, yr = top - gap * 0.6, ylab = -1e9;
+  for (const [n, c] of out) {
+    const h = b[n] * k, hh = Math.max(h, 1.5), xm = (x0 + x1) / 2;
+    s += `<path class="band" data-n="${esc(n)}" d="M${x0},${yl} C${xm},${yl} ${xm},${yr} ${x1},${yr} L${x1},${yr + hh} C${xm},${yr + hh} ${xm},${yl + hh} ${x0},${yl + hh} Z" fill="var(${c})" fill-opacity="0.82"/><rect x="${x1}" y="${yr}" width="8" height="${hh}" fill="var(${c})"/>`;
+    const yc = Math.max(yr + hh / 2, ylab + 34), nm = n.replace(" (rejetées au condenseur)", "");
+    s += `<text class="lbl" x="${x1 + 16}" y="${yc - 3}">${esc(nm)}</text><text class="tick" x="${x1 + 16}" y="${yc + 12}">${fr(b[n])} MW · ${fr(100 * b[n] / Q, 1)} %</text>`;
+    ylab = yc; yl += h; yr += hh + gap;
+  }
+  s += `</svg><div class="tip" hidden></div>`;
+  const host = document.getElementById("sankey"); host.innerHTML = s; host.style.position = "relative";
+  host.querySelectorAll(".band").forEach((p) => {
+    p.addEventListener("pointermove", (ev) => { const r = host.getBoundingClientRect(), n = p.dataset.n; tipAt(host, ev.clientX - r.left, ev.clientY - r.top, `${esc(n)} : ${fr(b[n], 1)} MW`); });
+    p.addEventListener("pointerleave", () => tipOff(host));
+  });
+})();
+
+/* ---------- tableau des états ---------- */
+(function () {
+  const lib = { "1": "sortie GV", "1c": "admission HP (après soupapes)", e1: "soutirage RHP2", e2: "soutirage RHP1", e3: "échappement HP", v_sech: "sortie sécheur", bp_in: "admission BP", e4: "soutirage RBP3", e5: "soutirage RBP2", e6: "soutirage RBP1", "2": "fin de détente (ELEP)", "2u": "échappement réel (UEEP)", "3": "condensat", c4: "sortie RBP3", a0: "sortie bâche", a1: "refoulement pompe alim.", "4": "eau alimentaire", P1: "primaire chaud", P2: "primaire froid" };
+  document.getElementById("tab-etats").innerHTML = `<thead><tr><th>point</th><th>ṁ (kg/s)</th><th>p (bar)</th><th>T (°C)</th><th>h (kJ/kg)</th><th>x</th></tr></thead><tbody>` +
+    D.etats.filter((e) => lib[e.id]).map((e) => `<tr><td class="txt">${lib[e.id]}</td><td>${fr(e.m)}</td><td>${fr(e.p, e.p < 1 ? 4 : 2)}</td><td>${fr(e.T, 1)}</td><td>${fr(e.h, 1)}</td><td>${e.x > 0 && e.x < 1 ? fr(e.x, 3) : "—"}</td></tr>`).join("") + `</tbody>`;
+})();
+
+/* ---------- exergie ---------- */
+(function () {
+  const ex = D.exergie, E = ex.exergie_primaire_MW;
+  const d = Object.entries(ex.destructions_MW).sort((a, b) => b[1] - a[1]);
+  const rows = [{ n: "Électricité nette", v: ex.electricite_nette_MW, c: "--s1" }]
+    .concat(d.map(([n, v]) => ({ n, v, c: "--s2" })))
+    .concat([{ n: "Exergie rejetée avec l'eau", v: ex.exergie_rejetee_eau_MW, c: "--s4" }])
+    .map((r) => ({ ...r, lab: `${fr(r.v)} MW · ${fr(100 * r.v / E, 1)} %`, tip: `${r.n} : ${fr(r.v, 1)} MW (${fr(100 * r.v / E, 2)} % de l'exergie fournie)` }));
+  barH(document.getElementById("ch-ex"), rows, { aria: "Destructions d'exergie par composant" });
+  const top = d[0];
+  document.getElementById("txt-exergie").textContent =
+    `Le primaire fournit ${fr(E)} MW d'exergie (état mort : eau à ${fr(ex.T0_C)} °C). ${fr(100 * ex.rendement_exergetique, 1)} % deviennent de l'électricité. Le premier poste de destruction est « ${top[0]} » (${fr(top[1])} MW), à cause de l'humidité dans les derniers étages. Il passe devant le transfert de chaleur dans le GV (${fr(ex.destructions_MW["Générateurs de vapeur"])} MW). Le condenseur détruit beaucoup d'énergie au sens du premier principe, mais peu d'exergie : la chaleur y est rejetée à 29 °C, presque à la température ambiante. Le bilan est fermé à ${Math.abs(ex.ecart_bilan_MW) < 1e-6 ? "moins de 10⁻⁶" : fr(ex.ecart_bilan_MW, 6)} MW près.`;
+})();
+
+/* ---------- météo réelle ---------- */
+(function () {
+  if (!A.chooz) { document.getElementById("meteo").hidden = true; return; }
+  const moy = (o) => Object.values(o).reduce((a, b) => a + b, 0) / Object.values(o).length;
+  const dE = 1000 * (A["chooz_+2"].energie_moyenne_TWh - A.chooz.energie_moyenne_TWh);
+  const m = A.chooz.mensuel, ete = (m.P[6] + m.P[7]) / 2, hiv = (m.P[0] + m.P[11]) / 2;
+  document.getElementById("kpis-annuel").innerHTML = [
+    [fr(A.chooz.energie_moyenne_TWh, 2), "TWh/an", "Chooz, moyenne 2015-2024"],
+    [fr(A.civaux.energie_moyenne_TWh, 2), "TWh/an", "Civaux, climat plus chaud"],
+    [fr(hiv - ete), "MWe", `écart hiver-été à Chooz (${fr(100 * (ete / hiv - 1), 1)} %)`],
+    [(dE >= 0 ? "+" : "−") + fr(Math.abs(dE)), "GWh/an", "Chooz, climat +2 °C (humidité relative constante)"],
+  ].map(([v, u, l]) => `<div class="kpi"><span class="v">${v} <small>${u}</small></span><span class="l">${l}</span></div>`).join("");
+  const mois = ["jan", "fév", "mar", "avr", "mai", "juin", "juil", "août", "sep", "oct", "nov", "déc"];
+  lineChart(document.getElementById("ch-mois"), {
+    aria: "Puissance mensuelle moyenne", x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], h: 300, unit: "MWe", td: 0,
+    xticks: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], xfmt: (t) => mois[t - 1],
+    band: { lo: m.P_min, hi: m.P_max, c: "--s1" },
+    series: [{ n: "Chooz", y: m.P, c: "--s1", markers: true }, { n: "Civaux", y: A.civaux.mensuel.P, c: "--s3", dash: "dot" }, { n: "Chooz +2 °C", y: A["chooz_+2"].mensuel.P, c: "--s2", dash: "dash" }],
+  });
+  if (D.carte_chooz) {
+    const Z = D.carte_chooz.valeurs.map((r) => r.slice(0, 365));
+    const debuts = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    heatmap(document.getElementById("carte"), Z, {
+      aria: "Puissance journalière à Chooz", rows: D.carte_chooz.annees.map(String), ch: 20,
+      cticks: debuts.map((j, i) => [j, mois[i]]),
+      tip: (i, j, v) => { const d = new Date(Date.UTC(D.carte_chooz.annees[i], 0, j + 1)); return `${d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}<br>${fr(v)} MWe`; },
+    });
+  }
+})();
+
+/* ---------- rejets ---------- */
+(function () {
+  const R = D.rejets, Z = R.P.slice().reverse(), Ts = R.T.slice().reverse();
+  heatmap(document.getElementById("ch-rej"), Z, {
+    aria: "Puissance admissible selon température et débit de la rivière", rows: Ts.map((t) => (t % 5 === 0 ? `${t} °C` : "")), ch: 11, gap: 0, ml: 52, lo: 0, hi: 1600,
+    cticks: [50, 100, 200, 500, 1000, 2000].map((q) => [Math.log(q / R.Q[0]) / Math.log(R.Q.at(-1) / R.Q[0]) * (R.Q.length - 1), `${q}`]),
+    xlabel: "Débit de la rivière (m³/s, échelle log)",
+    tip: (i, j, v) => `rivière ${fr(Ts[i])} °C · ${fr(R.Q[j])} m³/s<br>P admissible ${fr(v)} MWe`,
+  });
+})();
+
+/* ---------- incertitudes ---------- */
+(function () {
+  const I = D.incertitudes;
+  if (!I) { document.getElementById("incertitudes").hidden = true; return; }
+  const [p5, p50, p95] = I.pente_q, [t5, t50, t95] = I.T_opt_q;
+  document.getElementById("txt-inc").textContent =
+    `Huit hypothèses incertaines (rendements de turbine, coefficient de Baumann, vitesses d'échappement, courbe de pertes, part de résistance côté eau, pincement) ont été tirées au hasard ${I.n_ok} fois par hypercube latin, et chaque tirage a été recalculé complètement. La pente au-dessus de 15 °C vaut ${fr(p50, 2)} MWe/°C (intervalle 5-95 % : ${fr(p5, 2)} à ${fr(p95, 2)}). L'optimum, lui, est bien moins certain : entre ${fr(t5)} et ${fr(t95)} °C. La tornade montre pourquoi : il dépend surtout de la vitesse d'échappement retenue au design, c'est-à-dire de la taille de la dernière ailette BP. La sensibilité au-dessus de 15 °C est robuste, la position exacte de l'optimum ne l'est pas.`;
+  lineChart(document.getElementById("ch-inc"), { aria: "Bande d'incertitude de la puissance", x: I.T, w: 440, h: 270, unit: "MWe", td: 0, xlabel: "T eau (°C)", band: { lo: I.P_q05, hi: I.P_q95, c: "--s1" }, series: [{ n: "médiane", y: I.P_q50, c: "--s1" }] });
+  const lib = { rendement_isentropique_HP: "Rendement HP", rendement_isentropique_BP: "Rendement BP", coefficient_baumann: "Baumann", vitesse_annulaire_design_m_s: "Vitesse éch. design", vitesse_annulaire_blocage_m_s: "Vitesse de blocage", facteur_pertes_echappement: "Échelle EL(V)", part_resistance_cote_eau: "Résistance côté eau", pincement_condenseur_K: "Pincement condenseur" };
+  const ref = I.pente_nominale;
+  const rows = Object.entries(I.tornade).map(([k, v]) => ({ k, b: (v.bas ?? ref) - ref, h: (v.haut ?? ref) - ref }))
+    .sort((a, b) => Math.abs(b.h - b.b) - Math.abs(a.h - a.b))
+    .map((r) => ({ n: lib[r.k], v: [r.b, r.h], c: ["--s2", "--s1"], tip: `${lib[r.k]} : borne basse ${r.b >= 0 ? "+" : "−"}${fr(Math.abs(r.b), 2)}, borne haute ${r.h >= 0 ? "+" : "−"}${fr(Math.abs(r.h), 2)} MWe/°C` }));
+  barH(document.getElementById("ch-tor"), rows, { aria: "Tornade de sensibilité", ml: 150, td: 2 });
+})();
+
+/* ---------- courbe EL(V) ---------- */
+function pchip(xs, ys) {
+  const n = xs.length, h = [], dl = [];
+  for (let i = 0; i < n - 1; i++) { h.push(xs[i + 1] - xs[i]); dl.push((ys[i + 1] - ys[i]) / h[i]); }
+  const d = new Array(n).fill(0);
+  for (let i = 1; i < n - 1; i++) if (dl[i - 1] * dl[i] > 0) { const w1 = 2 * h[i] + h[i - 1], w2 = h[i] + 2 * h[i - 1]; d[i] = (w1 + w2) / (w1 / dl[i - 1] + w2 / dl[i]); }
+  const end = (h0, h1, m0, m1) => { let v = ((2 * h0 + h1) * m0 - h0 * m1) / (h0 + h1); if (Math.sign(v) !== Math.sign(m0)) v = 0; else if (Math.sign(m0) !== Math.sign(m1) && Math.abs(v) > Math.abs(3 * m0)) v = 3 * m0; return v; };
+  d[0] = end(h[0], h[1], dl[0], dl[1]); d[n - 1] = end(h[n - 2], h[n - 3], dl[n - 2], dl[n - 3]);
+  return (x) => { x = Math.min(Math.max(x, xs[0]), xs[n - 1]); let i = 0; while (i < n - 2 && x > xs[i + 1]) i++; const t = (x - xs[i]) / h[i], t2 = t * t, t3 = t2 * t; return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * d[i] + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h[i] * d[i + 1]; };
+}
+const EL = pchip(D.courbe_EL.V, D.courbe_EL.EL), Vb = D.parametres.vitesse_annulaire_blocage_m_s, elHost = document.getElementById("ch-el");
+(function () {
+  const W = 440, H = 270, m = { l: 46, r: 14, t: 12, b: 38 }, Vmin = 50, Vmax = 430, Emax = 100;
+  const X = (v) => m.l + (v - Vmin) / (Vmax - Vmin) * (W - m.l - m.r), Y = (e) => H - m.b - e / Emax * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Courbe de perte d'échappement"><rect x="${X(Vb)}" y="${m.t}" width="${X(Vmax) - X(Vb)}" height="${H - m.t - m.b}" fill="var(--zone)"/><text x="${X(Vb) + 4}" y="${m.t + 14}">blocage</text>`;
+  for (const t of [0, 20, 40, 60, 80, 100]) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text class="tick" x="${m.l - 8}" y="${Y(t) + 3.5}" text-anchor="end">${t}</text>`;
+  for (const t of [100, 200, 300, 400]) s += `<text class="tick" x="${X(t)}" y="${H - m.b + 16}" text-anchor="middle">${t}</text>`;
+  s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle">Vitesse axiale de sortie (m/s)</text>`;
+  const pts = []; for (let v = D.courbe_EL.V[0]; v <= D.courbe_EL.V.at(-1); v += 2) pts.push(`${X(v).toFixed(1)},${Y(EL(v)).toFixed(1)}`);
+  s += `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--s1)" stroke-width="2"/><circle class="op" r="6" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="lbl op-t"></text></svg>`;
+  elHost.innerHTML = s; elHost._X = X; elHost._Y = Y;
+})();
+
+/* ---------- curseur ---------- */
+const slider = document.getElementById("teau");
+function maj() {
+  const t = +slider.value, i = iT(t);
+  document.getElementById("tval").textContent = `${t} °C`;
+  document.getElementById("chip").hidden = !B.echappement_bloque[i];
+  const dP = B.puissance_electrique_nette_MW[i] - Dz.puissance_electrique_nette_MW;
+  document.getElementById("readouts").innerHTML = [
+    ["P nette", `${fr(B.puissance_electrique_nette_MW[i])} MWe`], ["écart / design", `${dP >= 0 ? "+" : "−"}${fr(Math.abs(dP), 1)} MWe`],
+    ["η net", `${fr(100 * B.rendement_net[i], 2)} %`], ["p condenseur", `${fr(B.p_condenseur_mbar[i], 1)} mbar`],
+    ["T condensation", `${fr(B.T_condenseur_C[i], 1)} °C`], ["p GV", `${fr(B.p_vapeur_bar[i], 2)} bar`],
+    ["V sortie BP", `${fr(B.vitesse_annulaire_m_s[i])} m/s`], ["perte éch.", `${fr(B.perte_echappement_MW[i], 1)} MW`],
+  ].map(([k, v]) => `<span>${k} <b>${v}</b></span>`).join("");
+  [chP, chPc, chE].forEach((c) => c.setMarker(t));
+  const v = B.vitesse_annulaire_m_s[i], op = elHost.querySelector(".op"), opt = elHost.querySelector(".op-t"), droite = v > 290;
+  op.setAttribute("cx", elHost._X(v)); op.setAttribute("cy", elHost._Y(EL(v)));
+  opt.setAttribute("x", elHost._X(v) + (droite ? -10 : 10)); opt.setAttribute("y", elHost._Y(EL(v)) - 10); opt.setAttribute("text-anchor", droite ? "end" : "start");
+  opt.textContent = `eau à ${t} °C · ${fr(v)} m/s`;
+}
+slider.addEventListener("input", maj);
+try { const v = localStorage.getItem("teau"); if (v !== null) slider.value = v; } catch (e) {}
+slider.addEventListener("change", () => { try { localStorage.setItem("teau", slider.value); } catch (e) {} });
+
+/* ---------- hypothèses ---------- */
+const prm = D.parametres, ps = prm.p_soutirages_bar;
+const items = (id, arr) => { document.getElementById(id).innerHTML = arr.map(([t, d]) => `<li><b>${t}</b><span>${d}</span></li>`).join(""); };
+items("hyp", [
+  ["Primaire et GV", `Puissance au secondaire = ${fr(prm.puissance_thermique_MW)} MW. Primaire à ${fr(prm.T_primaire_chaud_C)} → ${fr(prm.T_primaire_froid_C)} °C. En offdesign, la pression vapeur est calculée par le UA du GV à débit primaire fixé.`],
+  ["Turbines", `Rendements « vapeur sèche » HP ${fr(prm.rendement_isentropique_HP, 2)} et BP ${fr(prm.rendement_isentropique_BP, 2)}, pénalisés par la règle de Baumann (a = ${fr(prm.coefficient_baumann, 1)}). Loi du cône de Stodola en offdesign. Soupapes HP : ${fr(prm.dp_admission_HP_bar)} bar au design, libres ensuite.`],
+  ["Soutirages", `RHP2 ${fr(ps.RHP2)}, RHP1 ${fr(ps.RHP1)}, bâche ${fr(ps.bache)}, RBP3 ${fr(ps.RBP3)}, RBP2 ${fr(ps.RBP2, 1)}, RBP1 ${fr(ps.RBP1, 1)} bar. Écart terminal ${fr(prm.ttd_rechauffeurs_K)} K, purges en cascade.`],
+  ["Sécheur-surchauffeur", `Séparation idéale. Surchauffe par vapeur vive jusqu'à T_sat − ${fr(prm.ttd_surchauffeur_K)} K, perte de charge ${fr(prm.dp_surchauffeur_bar, 1)} bar.`],
+  ["Condenseur", `Pincement ${fr(prm.pincement_condenseur_K)} K et échauffement ${fr(prm.echauffement_eau_refroidissement_K)} K au design. Débit d'eau fixé et UA corrigé selon la température d'eau en offdesign.`],
+  ["Tour", `Dimensionnée pour un air à ${fr(D.tour.T_seche_C)} °C et ${fr(100 * D.tour.HR)} % d'humidité, eau froide ${fr(D.tour.T_eau_froide_C)} °C, L/G = ${fr(D.tour.L_G, 1)}. Merkel avec Le = 1, tirage naturel, débit d'eau constant.`],
+  ["Production annuelle", "Réacteur à pleine puissance toute l'année : ni arrêt, ni suivi de charge. L'énergie calculée est donc un maximum théorique."],
+]);
+items("verif", [
+  ["<span class='pill'>OK</span> Calcul indépendant (cycle simple)", "Point de design recalculé sans TESPy : écart inférieur à 10⁻⁵."],
+  ["<span class='pill'>OK</span> Bilans d'énergie et de matière (N4)", "Fermés à la précision machine, au design et sur tout le balayage."],
+  ["<span class='pill'>OK</span> Second principe composant par composant", "Aucune entropie détruite négative. Bilan d'exergie fermé."],
+  ["<span class='pill'>OK</span> Tour", "Intégration de Tchebychev comparée à une intégration numérique fine (écart inférieur à 1 %). Point de conception retrouvé. Eau jamais sous la température humide."],
+  ["<span class='pill'>OK</span> Offdesign", "Le calcul à 15 °C redonne le design. La pression GV calculée reste à 72 bar ± 0,5."],
+]);
+items("limites", [
+  ["Courbe d'échappement générique", "Les courbes de la turbine Arabelle ne sont pas publiques. C'est l'hypothèse qui pèse le plus sur l'optimum."],
+  ["Limites de rejet illustratives", "Les seuils réels dépendent de l'arrêté de chaque site."],
+  ["Tour simplifiée", "Pas de vent, pas de recirculation de panache, pas d'antigel modélisé : l'eau froide est simplement bornée à 0-35 °C."],
+  ["Pas de charge partielle", "Le rendement est supposé constant quand on réduit la puissance pour respecter les rejets."],
+]);
+maj();
+</script>

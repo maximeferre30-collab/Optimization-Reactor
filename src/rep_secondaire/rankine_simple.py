@@ -41,6 +41,7 @@ from tespy.components import (
 from tespy.connections import Connection
 from tespy.networks import Network
 
+from .condenseur import facteur_UA
 from .echappement import LigneDetente, etat_echappement, section_annulaire
 from .parametres import ParametresRankine
 
@@ -168,20 +169,25 @@ class RankineSimple:
         la surface d'échange et des pompes de circulation.
         """
         c = self.c
-        # Condenseur : pincement -> coefficient d'échange global UA (corrigé selon les
-        # débits par les caractéristiques par défaut de TESPy)
-        self.condenseur.set_attr(design=["ttd_u"], offdesign=["UA_char"])
+        # Condenseur : pincement imposé au design. En offdesign :
+        # - avec correction en température : UA imposé explicitement
+        #   (UA_design x facteur(T_eau), mis à jour par point fixe) ;
+        # - sinon : UA_char de TESPy (UA corrigé selon les seuls débits).
+        if self.params.correction_UA_temperature:
+            self.condenseur.set_attr(design=["ttd_u"], offdesign=[])
+        else:
+            self.condenseur.set_attr(design=["ttd_u"], offdesign=["UA_char"])
         # Eau de refroidissement : échauffement imposé -> débit imposé
         # (pompes de circulation à débit constant)
         c["12"].set_attr(design=["T"])
         c["11"].set_attr(offdesign=["m"])
-        # Turbine : rendement fixe -> rendement fonction du débit volumique.
+        # Turbine : rendement fixe -> rendement fonction du débit.
         # La pression vapeur reste imposée (72 bar) : sur un REP à puissance
         # nominale, la régulation maintient la température moyenne primaire,
         # donc T_sat (et p) au secondaire du GV. La loi du cône n'est pas
         # activée : les soupapes d'admission absorbent l'écart.
         self.turbine.set_attr(design=["eta_s"], offdesign=["eta_s_char"])
-        # Pompe : rendement fonction du débit
+        # Pompe : rendement fonction du débit volumique
         self.pompe.set_attr(design=["eta_s"], offdesign=["eta_s_char"])
 
     # ------------------------------------------------------------------ #
@@ -201,42 +207,70 @@ class RankineSimple:
             self.section_annulaire_m2 = section_annulaire(
                 m, ligne, p_cond, self.params.vitesse_annulaire_design_m_s)
         return etat_echappement(m, ligne, p_cond, self.section_annulaire_m2,
-                                self.params.vitesse_annulaire_blocage_m_s)
+                                self.params.vitesse_annulaire_blocage_m_s,
+                                self.params.facteur_pertes_echappement)
 
-    def _resoudre_avec_pertes(self, mode, design_path=None) -> None:
-        """Point fixe : la perte dépend de la pression condenseur, qui dépend
-        elle-même de la chaleur à évacuer (donc de la perte)."""
+    def _T_moy_eau(self) -> float:
+        return 0.5 * (self.c["11"].T.val + self.c["12"].T.val)
+
+    def _UA_cible(self, T_moy_C: float) -> float:
+        d = self.complements
+        return d["UA_design_W_K"] * facteur_UA(
+            T_moy_C, d["T_moy_eau_design_C"], self.params.part_resistance_cote_eau)
+
+    def _point_fixe(self, mode, design_path=None) -> None:
+        """Résout le réseau, puis met à jour par point fixe les grandeurs
+        calculées hors de TESPy :
+        - la perte d'échappement, qui dépend de la pression au condenseur,
+          elle-même fonction de la chaleur à évacuer (donc de la perte) ;
+        - en offdesign, le UA du condenseur, qui dépend de la température
+          moyenne de l'eau, elle-même résultat du calcul.
+        """
+        p = self.params
+        corriger_UA = mode == "offdesign" and p.correction_UA_temperature
         self._solve(mode, design_path)
-        if not self.params.pertes_echappement:
-            self.etat_ech = None
-            return
         for _ in range(ITERATIONS_POINT_FIXE_MAX):
-            if mode == "design":
-                self.section_annulaire_m2 = None
-            etat = self._etat_echappement()
-            ecart = abs(etat.perte_MW - self.pertes.Q.val)
-            if ecart < TOLERANCE_POINT_FIXE_MW:
+            a_change = False
+            if p.pertes_echappement:
+                if mode == "design":
+                    self.section_annulaire_m2 = None
+                etat = self._etat_echappement()
+                if abs(etat.perte_MW - self.pertes.Q.val) > TOLERANCE_POINT_FIXE_MW:
+                    self.pertes.set_attr(Q=etat.perte_MW)
+                    a_change = True
+            if corriger_UA:
+                UA = self._UA_cible(self._T_moy_eau())
+                if abs(UA / self.condenseur.UA.val_SI - 1.0) > 1e-7:
+                    self.condenseur.set_attr(UA=UA)
+                    a_change = True
+            if not a_change:
                 break
-            self.pertes.set_attr(Q=etat.perte_MW)
             self._solve(mode, design_path)
         else:
-            raise RuntimeError("Point fixe des pertes d'échappement non convergé")
-        self.etat_ech = etat
+            raise RuntimeError("Point fixe (échappement / UA) non convergé")
+        self.etat_ech = etat if p.pertes_echappement else None
 
     def resoudre(self) -> ResultatsRankine:
         """Calcul de dimensionnement (mode design)."""
-        self._resoudre_avec_pertes("design")
+        self.condenseur.set_attr(UA=None)
+        self._point_fixe("design")
+        self.complements = {
+            "section_annulaire_m2": self.section_annulaire_m2,
+            "UA_design_W_K": self.condenseur.UA.val_SI,
+            "T_moy_eau_design_C": self._T_moy_eau(),
+        }
         return self.resultats()
 
     def sauvegarder_design(self, chemin) -> None:
         """Sauvegarde le point de dimensionnement (référence de l'offdesign).
-        La section annulaire BP, qui n'est pas un paramètre TESPy, est écrite
-        dans un fichier voisin."""
+        Les grandeurs de design calculées hors de TESPy (section annulaire BP,
+        UA et température moyenne d'eau du condenseur) sont écrites dans un
+        fichier voisin."""
         chemin = Path(chemin)
         self.nw.save(str(chemin))
         self._design_path = str(chemin)
-        chemin.with_suffix(".echappement.json").write_text(
-            json.dumps({"section_annulaire_m2": self.section_annulaire_m2}))
+        chemin.with_suffix(".complements.json").write_text(
+            json.dumps(self.complements, indent=2))
 
     def resoudre_offdesign(
         self, T_eau_refroidissement_C: float, design_path=None
@@ -246,11 +280,14 @@ class RankineSimple:
         design_path = design_path or self._design_path
         self.params.T_eau_refroidissement_C = T_eau_refroidissement_C
         self.c["11"].set_attr(T=T_eau_refroidissement_C)
-        if self.params.pertes_echappement:
-            annexe = Path(design_path).with_suffix(".echappement.json")
-            self.section_annulaire_m2 = json.loads(
-                annexe.read_text())["section_annulaire_m2"]
-        self._resoudre_avec_pertes("offdesign", design_path)
+        self.complements = json.loads(
+            Path(design_path).with_suffix(".complements.json").read_text())
+        self.section_annulaire_m2 = self.complements["section_annulaire_m2"]
+        if self.params.correction_UA_temperature:
+            T_moy_estimee = (T_eau_refroidissement_C
+                             + 0.5 * self.params.echauffement_eau_refroidissement_K)
+            self.condenseur.set_attr(UA=self._UA_cible(T_moy_estimee))
+        self._point_fixe("offdesign", design_path)
         return self.resultats()
 
     def resultats(self) -> ResultatsRankine:

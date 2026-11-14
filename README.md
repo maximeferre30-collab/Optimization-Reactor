@@ -1,12 +1,20 @@
 # Circuit secondaire d'un REP N4 avec TESPy
 
-Le but du projet est de modéliser le circuit secondaire (eau-vapeur) d'un réacteur
-à eau pressurisée du palier N4 (Chooz B, Civaux : 4 270 MWth) et d'étudier
-l'effet de la **température de l'eau de refroidissement** sur la puissance électrique.
+Ce projet modélise le circuit eau-vapeur d'une tranche du palier N4 (Chooz B,
+Civaux : 4 270 MWth). Il étudie l'effet de la **température de la source
+froide** sur la puissance électrique, depuis un cycle de Rankine d'école
+jusqu'à une étude sur dix ans de météo réelle.
 
-- **Étape 1** : cycle de Rankine simple, sans soutirages ni sécheur-surchauffeur (MSR).
-- **Étape 2** : étude offdesign de la sensibilité à la température de l'eau froide.
-- **Étape 3 (actuelle)** : pertes d'échappement de la turbine BP (méthode Spencer-Cotton-Cannon).
+| Étape | Contenu |
+|---|---|
+| 1 | Cycle de Rankine simple (GV, turbine, condenseur, pompe) |
+| 2 | Étude offdesign : installation figée, température d'eau variable |
+| 3 | Pertes d'échappement BP (Spencer-Cotton-Cannon), correction de UA du condenseur, vérification indépendante |
+| 4 | **Cycle N4 complet** : turbine HP en 3 tronçons, sécheur-surchauffeur, turbine BP en 4 tronçons, 3 réchauffeurs BP, bâche, 2 réchauffeurs HP, primaire du GV, règle de Baumann |
+| 5 | **Analyse exergétique** (Gouy-Stodola), composant par composant |
+| 6 | **Tour aéroréfrigérante** à tirage naturel (Merkel) et **production horaire sur météo réelle** 2015-2024 (Chooz, Civaux), scénario climat +2 °C |
+| 7 | **Limites réglementaires de rejet** (variante circuit ouvert) |
+| 8 | **Incertitudes** : Monte-Carlo par hypercube latin et analyse en tornade |
 
 ## Installation
 
@@ -17,193 +25,197 @@ pip install -r requirements.txt
 pip install -e ".[dev]"
 ```
 
-`requirements.txt` fige les versions exactes testées (TESPy 0.12.0, CoolProp 8.0).
-`pyproject.toml` déclare le paquet `rep_secondaire` et ses dépendances minimales.
-
-## Utilisation
+## Tout recalculer et visualiser
 
 ```bash
-python scripts/run_rankine_simple.py      # point de dimensionnement
-python scripts/etude_source_froide.py     # balayage 0-35 °C -> results/
-pytest
+python scripts/telecharger_meteo.py   # météo ERA5 (déjà fournie dans data/)
+python scripts/incertitudes.py        # Monte-Carlo, ~20 min sur 8 cœurs
+python scripts/figures_rapport.py     # toutes les études et figures, ~8 min
+python scripts/rapport_html.py        # rapport interactif
+```
+
+Ouvrir ensuite **`results/rapport.html`** dans un navigateur. Le rapport contient :
+- un curseur de température d'eau, qui met à jour les valeurs et déplace un repère sur les graphiques ;
+- le schéma du circuit, le diagramme T-s, le Sankey et le bilan d'exergie ;
+- la carte jour par jour sur dix ans ;
+- la carte des limites de rejet ;
+- les bandes d'incertitude et la tornade.
+
+Avec `--cache`, `figures_rapport.py` réutilise les balayages déjà calculés.
+
+Figures PNG (200 dpi) dans `results/` :
+
+| Fichier | Contenu |
+|---|---|
+| `fig1_cycle_n4_Ts.png` | Cycle N4 et cycle simple dans le diagramme T-s |
+| `fig2_bilan_sankey.png` | Bilan d'énergie au design |
+| `fig3_puissance_n4.png` | Puissance en fonction de la température d'eau (N4, N4 sans pertes, cycle simple) |
+| `fig4_pertes_echappement.png` | Courbe de pertes BP et points de fonctionnement |
+| `fig5_exergie.png` | Destructions d'exergie par composant |
+| `fig6_production_mensuelle.png` | Puissance mois par mois (Chooz, Civaux, climat +2 °C) |
+| `fig7_carte_journaliere.png` | Puissance jour par jour à Chooz, 2015-2024 |
+| `fig8_rejets.png` | Puissance admise par les limites de rejet (circuit ouvert) |
+| `fig9_incertitudes.png` | Bande d'incertitude et tornade |
+
+```bash
+pytest     # 26 vérifications automatiques
 ```
 
 ## Arborescence
 
 ```
 src/rep_secondaire/
-    parametres.py       # tous les paramètres de conception (dataclass)
-    rankine_simple.py   # construction et résolution du réseau TESPy (design + offdesign)
-    echappement.py      # pertes d'échappement BP (courbe SCC, blocage)
-    etude_source_froide.py  # balayage en température de l'eau de refroidissement
-scripts/
-    run_rankine_simple.py  # affiche états, bilan et rendements
-    etude_source_froide.py # CSV + figure de l'étude de sensibilité
-tests/                  # contrôles : bilan d'énergie, ordres de grandeur, tendance
-results/                # sorties (CSV, figures), non versionnées
+    parametres.py           # ParametresRankine (cycle simple) et ParametresN4
+    rankine_simple.py       # cycle simple (étapes 1 à 3)
+    cycle_n4.py             # cycle N4 complet (TESPy), design + offdesign
+    echappement.py          # pertes d'échappement BP (SCC, blocage)
+    condenseur.py           # correction de UA avec la température d'eau
+    exergie.py              # bilan d'exergie par composant
+    tour.py                 # tour à tirage naturel (Merkel)
+    annuel.py               # chaîne météo -> tour -> centrale, agrégations
+    rejets.py               # limites de rejet thermique
+    incertitudes.py         # Monte-Carlo et tornade
+    etude_source_froide.py  # balayage en température (cycle simple ou N4)
+    diagrammes.py, figures.py, figures_n4.py
+scripts/                    # points d'entrée (voir plus haut)
+data/meteo_*.csv            # météo horaire ERA5 2015-2024 (Open-Meteo, CC BY 4.0)
+rapport/modele_rapport.html # gabarit du rapport interactif
+tests/                      # vérifications (pytest)
 ```
 
-## Le modèle
+## Le cycle N4 modélisé
 
 ```
- (0) ──► [GV] ──(1)──► [Turbine] ──(2)──► [Pertes échappement] ──(2u)──► [Condenseur] ──(3)──► [Pompe] ──(4)──► [Fermeture] ──► (0)
-                                                                          ▲   │
-                                                    eau froide (11) ──────┘   └──── (12) rejet
+Primaire ─► [GV] ─► vapeur vive ─┬─► soupapes ─► HP1 ─► HP2 ─► HP3 ─► [Sécheur] ─► [Surchauffeur] ─► BP1 ─► BP2 ─► BP3 ─► BP4 ─► [Pertes éch.] ─► [Condenseur] ◄─► Tour
+                                 └──────────────────────────────────────────────────────┘ (vapeur de surchauffe)
+Poste d'eau : Condenseur ─► CEX ─► RBP1 ─► RBP2 ─► RBP3 ─► Bâche ─► Pompe alim. ─► RHP1 ─► RHP2 ─► GV
+Soutirages : HP1→RHP2 (30 bar), HP2→RHP1 (18 bar), HP3→bâche + sécheur (10 bar), BP1→RBP3 (4 bar), BP2→RBP2 (1,5 bar), BP3→RBP1 (0,4 bar)
+Purges en cascade : surchauffeur → RHP2 → RHP1 → bâche ; RBP3 → RBP2 → RBP1 → condenseur
 ```
 
-| Composant | Classe TESPy | Ce qu'on impose |
+Les choix de modélisation qui comptent :
+
+- **GV avec son primaire.** Au design, on impose 72 bar. En offdesign, la
+  pression résulte du UA du GV, à débit primaire et puissance fixés. Elle reste
+  à 72,0 bar sur toute la plage, ce qui valide l'hypothèse des étapes 1 à 3.
+- **Turbines.** Les rendements « vapeur sèche » (HP 0,89, BP 0,91) sont pénalisés
+  par la règle de Baumann : η = η_sec·(1 − y_moy). Les tronçons humides tombent
+  à 0,77-0,85. En offdesign, la loi du cône de Stodola s'applique à chaque
+  tronçon, et la perte de charge des soupapes HP devient libre (vannes de réglage).
+- **Échangeurs.** Écart terminal de 3 K au design, puis UA_char en offdesign.
+  La bâche est un réchauffeur à mélange avec sortie en liquide saturé.
+- **Condenseur et échappement.** Ce sont les modèles des étapes précédentes :
+  UA corrigé selon la température d'eau, pertes SCC avec blocage.
+
+### Validation contre les données publiques
+
+| Grandeur | Modèle | Publié (ordre de grandeur) | Écart |
+|---|---|---|---|
+| Puissance électrique brute | 1 589 MWe | ≈ 1 560 MWe | +1,9 % |
+| Eau alimentaire | 230,9 °C | ≈ 230 °C | +0,4 % |
+| Débit de vapeur | 2 406 kg/s | ≈ 2 400 kg/s | +0,2 % |
+| Pression vapeur | 72,0 bar | ≈ 72 bar | — |
+
+Le modèle **n'est pas calé** : l'écart de +1,9 % vient de ce qu'il ignore (fuites
+aux garnitures, purges des GV, vapeur auxiliaire, pertes de charge des soutirages).
+
+## Résultats
+
+### Effet de la température d'eau (cycle N4)
+
+- **Au design (eau à 15 °C) :** 1 589 MWe bruts, 1 562 MWe nets, rendement du cycle 37,2 %.
+- **Optimum :** 1 574 MWe nets pour une eau à 9 °C. En dessous de 6 °C,
+  l'échappement BP est bloqué.
+- **Au-dessus de 15 °C :** −6,7 MWe/°C (−0,43 %/°C), contre −5,6 MWe/°C pour le cycle simple.
+- **Dans la zone bloquée,** la puissance reste plate. Dans le cycle simple, elle
+  baissait, parce que le condensat froid n'était pas réchauffé par des soutirages.
+
+![Puissance](results/fig3_puissance_n4.png)
+![T-s](results/fig1_cycle_n4_Ts.png)
+
+### Exergie
+
+Le primaire fournit 2 164 MW d'exergie (état mort : 15 °C). Le rendement
+exergétique vaut 72 %. Les plus grosses destructions ont lieu dans la **turbine
+BP** (134 MW, à cause de l'humidité), puis dans le **GV** (107 MW, écart de
+température primaire-secondaire) et la **turbine HP** (89 MW). Le condenseur
+rejette 2 600 MW de chaleur, mais ne détruit que 79 MW d'exergie : cette
+chaleur est à 29 °C, presque à la température ambiante.
+
+![Exergie](results/fig5_exergie.png)
+
+### Météo réelle, tour aéroréfrigérante, climat
+
+La chaîne de calcul est la suivante : air (ERA5 horaire) → tour à tirage naturel (Merkel, Le = 1,
+tirage (L/G)²·Δρ = cte) → eau au condenseur → puissance (balayage offdesign N4).
+On suppose le réacteur à pleine puissance toutes les heures.
+
+| | Chooz | Civaux |
 |---|---|---|
-| Générateur de vapeur (4 GV agrégés) | `SimpleHeatExchanger` | Q = 4 270 MW, Δp = 8 bar ; sortie : 72 bar, x = 1 |
-| Turbine (HP + BP en un seul corps) | `Turbine` | η_is = 0,85 (ligne de détente) |
-| Pertes d'échappement BP | `SimpleHeatExchanger` | Q = perte SCC, calculée par point fixe |
-| Condenseur | `Condenser` | pincement T_sat − T_sortie eau = 4 K, Δp = 0 |
-| Eau de refroidissement | `Source` / `Sink` | entrée 15 °C, sortie 25 °C |
-| Pompe alimentaire | `Pump` | η_is = 0,80 |
-| Fermeture de cycle | `CycleCloser` | (outil numérique, voir plus bas) |
+| Production nette moyenne | 13,58 TWh/an | 13,55 TWh/an |
+| Puissance moyenne en janvier / en août | 1 568 / 1 525 MWe | 1 565 / 1 521 MWe |
+| Climat +2 °C (humidité relative constante) | −54 GWh/an (−0,4 %) | −58 GWh/an (−0,4 %) |
 
-Le solveur calcule le reste : le débit de vapeur (pour absorber 4 270 MW), la
-pression au condenseur (via le pincement), le titre en sortie turbine, le débit
-d'eau de refroidissement, et toutes les puissances.
+![Mensuel](results/fig6_production_mensuelle.png)
+![Carte](results/fig7_carte_journaliere.png)
 
-### Hypothèses
+### Limites de rejet (variante circuit ouvert)
 
-- **Puissance au secondaire égale à la puissance du réacteur.** On néglige les
-  ~20 MW apportés par les pompes primaires et les pertes thermiques.
-- **Vapeur saturée sèche à 72 bar.** En réalité le titre en sortie GV est d'environ
-  0,9975. Les pertes de charge de la ligne vapeur ne sont pas modélisées.
-- **Δp de 8 bar côté alimentation.** Ce chiffre regroupe les pertes de la ligne
-  d'eau alimentaire et du GV. La pompe refoule donc à 80 bar.
-- **Une seule détente, η_is = 0,85.** Sans MSR, la vapeur sort de la turbine à
-  x ≈ 0,73, soit environ 27 % d'humidité. Une vraie turbine ne le supporterait pas
-  (érosion des aubages, et environ −1 % de rendement par % d'humidité selon la
-  règle de Baumann). Le MSR sert justement à corriger ça.
-- **Condenseur dimensionné par son pincement.** Avec 15 °C + 10 K + 4 K, on obtient
-  T_sat = 29 °C, soit p ≈ 40 mbar, ce qui correspond à l'ordre de grandeur N4.
-  Le sous-refroidissement est nul (liquide saturé en sortie).
-- **Rendement mécanique × alternateur = 0,985, moteur de pompe = 0,95.** On suppose
-  la pompe entraînée électriquement. Sur N4, ce sont des turbopompes. Les
-  auxiliaires ne sont pas comptés.
-- **Calcul en mode *design*.** On fixe ΔT et le pincement, et le débit d'eau de
-  refroidissement en découle. L'étude de sensibilité, elle, se fait en
-  *offdesign* (voir plus bas).
+Avec une tour, la chaleur part dans l'air. Si la tranche était refroidie
+directement par la rivière, ses ≈ 2 600 MW rejetés limiteraient la puissance dès
+que la rivière est chaude ou à faible débit. Les limites utilisées sont
+**illustratives** (échauffement ≤ 3 K, aval ≤ 28 °C), car chaque site a son
+propre arrêté.
 
-### Rôle du `CycleCloser`
+![Rejets](results/fig8_rejets.png)
 
-TESPy résout un système d'équations. Dans une boucle fermée, la conservation de
-la masse et de l'énergie rend une équation redondante. Le `CycleCloser` coupe
-numériquement la boucle pour supprimer cette redondance. Il n'a aucun sens
-physique.
+### Incertitudes
 
-## Pertes d'échappement BP
+Huit hypothèses incertaines ont été tirées 64 fois par hypercube latin, et chaque
+tirage a été recalculé complètement (design et balayage, 0 échec) :
+- rendements HP et BP ;
+- coefficient de Baumann ;
+- vitesses d'échappement de design et de blocage ;
+- échelle de la courbe de pertes ;
+- part de résistance côté eau ;
+- pincement.
 
-Toute l'énergie disponible en fin de détente n'est pas convertie en travail
-au dernier étage BP. On utilise la méthode de Spencer-Cotton-Cannon (SCC),
-employée par les constructeurs pour les bilans de turbines à vapeur :
+Une analyse en tornade complète l'étude : chaque hypothèse est mise à ses bornes, une à la fois.
 
-- **ELEP** (*expansion line end point*, point (2)) : sortie de la ligne de détente, calculée par TESPy avec η_is.
-- **UEEP** (*used energy end point*, point (2u)) : état réellement envoyé au condenseur.
-- h_UEEP = h_ELEP + EL(V) · 0,87 · (1 − 0,01 Y) · (1 − 0,0065 Y), avec Y l'humidité en %.
-- V est la vitesse axiale dans la section annulaire de sortie : V = ṁ · v / A.
-
-La courbe EL(V) a trois zones :
-
-- **Faible vitesse** (eau chaude, pression élevée) : des pertes de décollement et de recirculation apparaissent dans le dernier étage (*turn-up*).
-- **Vitesse moyenne** : la perte passe par un minimum, vers 150-200 m/s.
-- **Grande vitesse** (eau froide, vide poussé) : la perte d'énergie cinétique croît en V². À partir de **400 m/s, l'écoulement est bloqué**. Abaisser la pression au condenseur sous la pression de blocage p* ne produit alors plus de travail. Le travail de détente entre p* et p_cond est compté comme perdu.
-
-Choix de modélisation :
-
-- **Section annulaire.** On la fixe pour obtenir 250 m/s au point de design, puis on la garde constante en offdesign. On n'a pas repris la section réelle d'Arabelle : sans soutirages, notre cycle envoie au condenseur beaucoup plus de vapeur que la vraie machine.
-- **Courbe EL(V) générique.** Elle reproduit la forme des courbes SCC, mais elle n'est pas calée sur la turbine du N4, dont les courbes ne sont pas publiques.
-- **Couplage avec TESPy.** La perte est retirée de la puissance de la turbine et rendue au fluide par un bloc `SimpleHeatExchanger`. Elle augmente donc la chaleur à évacuer au condenseur, ce qui modifie la pression au condenseur, qui modifie à son tour la perte. On résout cette boucle par **point fixe**. Le bilan d'énergie reste exactement fermé.
-- `ParametresRankine(pertes_echappement=False)` retrouve le modèle des étapes 1 et 2.
-
-## Résultats au point de design (15 °C)
-
-| Grandeur | Avec pertes d'échappement | Sans (étape 1) |
+| Grandeur | Médiane | Intervalle 5-95 % |
 |---|---|---|
-| Débit vapeur | 1 618 kg/s | 1 618 kg/s |
-| Pression / température condenseur | 40,1 mbar / 29,0 °C | 40,1 mbar / 29,0 °C |
-| Titre sortie turbine | 0,738 | 0,731 |
-| Vitesse annulaire (section 164 m²) | 250 m/s | — |
-| Perte d'échappement | 26 MW | — |
-| Puissance turbine | 1 382 MW | 1 408 MW |
-| Puissance pompe | 16 MW | 16 MW |
-| Chaleur rejetée | 2 904 MW | 2 878 MW |
-| Puissance électrique nette | 1 345 MWe | 1 370 MWe |
-| **Rendement du cycle** | **32,0 %** | 32,6 % |
-| Rendement net électrique | 31,5 % | 32,1 % |
-| Rendement de Carnot (288 °C / 15 °C) | 48,6 % | 48,6 % |
+| Pente au-dessus de 15 °C | −6,72 MWe/°C | −7,15 à −6,22 |
+| Température d'optimum | 9 °C | 4 à 12 °C |
+| Puissance nette au design | 1 560 MWe | 1 537 à 1 594 |
 
-Le N4 réel atteint environ 34-35 % brut. On s'attend à combler l'écart avec les
-soutirages (eau alimentaire réchauffée à ~230 °C) et le MSR.
+- **La sensibilité au-dessus de 15 °C est robuste.**
+- **La position de l'optimum ne l'est pas.** Elle dépend surtout de la vitesse
+  d'échappement au design, c'est-à-dire de la taille de la dernière ailette BP.
+- **La vitesse de blocage n'influe pas sur la pente au-dessus de 15 °C**, ce qui
+  est attendu : l'écoulement n'y est jamais bloqué.
 
-## Étude offdesign : effet de la température de l'eau de refroidissement
+![Incertitudes](results/fig9_incertitudes.png)
 
-On fait d'abord le dimensionnement à 15 °C, puis on fige l'installation. On fait
-ensuite varier la seule température d'entrée de l'eau, de 0 à 35 °C.
+## Vérifications (`pytest`)
 
-| Grandeur | Design (15 °C) | Offdesign |
-|---|---|---|
-| Condenseur | pincement 4 K | UA fixé (corrigé selon les débits par `UA_char`) |
-| Eau de refroidissement | ΔT = 10 K | débit fixé (pompes de circulation à débit constant) |
-| Turbine | η_is = 0,85 | η_is selon le débit (`eta_s_char`) |
-| Pompe | η_is = 0,80 | η_is selon le débit (`eta_s_char`) |
-| Puissance réacteur, p vapeur | 4 270 MW, 72 bar | inchangées |
+- **Cycle simple :** point de design recalculé indépendamment (CoolProp seul),
+  écart inférieur à 10⁻⁵.
+- **Cycle N4 :**
+  - bilans d'énergie et de matière fermés ;
+  - aucune création d'entropie négative, composant par composant ;
+  - bilan d'exergie fermé à 10⁻⁶ MW ;
+  - ordres de grandeur N4 retrouvés ;
+  - l'offdesign à 15 °C redonne le design, et la pression GV calculée reste à 72 ± 0,5 bar.
+- **Tour :**
+  - Tchebychev 4 points contre une intégration numérique fine : écart inférieur à 1 % ;
+  - point de conception retrouvé ;
+  - eau jamais sous la température humide.
+- **Rejets :** comportements limites vérifiés (grand fleuve, rivière déjà trop chaude).
 
-Pourquoi la pression vapeur reste fixée : à puissance nominale, la régulation du
-primaire maintient la température moyenne de l'eau. La température de
-saturation au GV, donc sa pression, ne bouge presque pas. Pour cette raison, la
-loi du cône de Stodola n'est pas activée.
+## Limites
 
-Pour faire converger le solveur de Newton, on se déplace par pas d'au plus 1 K
-à partir du point de dimensionnement. Chaque calcul part de la solution
-précédente.
-
-### Résultats
-
-| T eau (°C) | p cond (mbar) | V annulaire (m/s) | Perte éch. (MW) | P nette (MWe) | P nette sans pertes (MWe) |
-|---|---|---|---|---|---|
-| 0 | 16,1 | 400 (bloqué) | 120 | 1 328 | 1 449 |
-| 5 | 22,0 | 400 (bloqué) | 85 | 1 338 | 1 423 |
-| 10 | 29,8 | 326 | 45 | 1 351 | 1 396 |
-| **15** | **40,1** | **250** | **26** | **1 345** | **1 370** |
-| 20 | 53,5 | 193 | 20 | 1 324 | 1 344 |
-| 25 | 70,8 | 150 | 20 | 1 298 | 1 317 |
-| 30 | 92,9 | 118 | 26 | 1 266 | 1 291 |
-| 35 | 120,7 | 94 | 35 | 1 230 | 1 265 |
-
-Résultats principaux :
-
-- **La puissance passe par un optimum : 1 351 MWe vers 11 °C.** Sans les pertes d'échappement, la puissance augmentait indéfiniment quand l'eau refroidissait.
-- **Au-dessus de 15 °C, la sensibilité vaut −5,8 MWe/°C, soit −0,43 %/°C.** C'est un peu plus que sans les pertes (−5,3 MWe/°C), à cause du *turn-up* aux faibles vitesses.
-- **En dessous de 7 °C, l'échappement est bloqué** (p* ≈ 23,5 mbar).
-
-![Étude source froide](results/etude_source_froide.png)
-
-Lecture physique :
-
-- **Eau chaude.** La vapeur condense plus chaud, donc la pression au condenseur augmente et la détente est plus courte : on récupère moins de travail. La pression de saturation croît à peu près exponentiellement avec la température, mais la perte de puissance reste presque linéaire, car le travail récupéré dépend de la température de condensation et non de la pression.
-- **Eau froide, jusqu'au blocage.** La vapeur gagne en volume spécifique, donc la vitesse de sortie augmente et l'énergie cinétique perdue grandit. Le gain de détente est en partie mangé.
-- **Eau froide, au-delà du blocage.** La turbine ne profite plus du vide supplémentaire. La puissance baisse même un peu : le condensat plus froid doit être davantage réchauffé dans le GV, donc pour une même puissance thermique le débit de vapeur diminue. Avec des soutirages, cet effet serait en grande partie compensé.
-- **Conséquence pratique.** Pour un condenseur et une turbine donnés, il existe une température d'eau, et donc un vide, optimale. Pousser le vide au-delà ne sert à rien. C'est pour cette raison que la section d'échappement BP, c'est-à-dire la longueur de la dernière ailette, se choisit en fonction du climat du site.
-
-### Limites
-
-- **Courbe d'échappement générique.** La position de l'optimum (11 °C) dépend
-  directement de la vitesse annulaire choisie au design (250 m/s) et de la
-  vitesse de blocage (400 m/s). Les deux sont des paramètres à faire varier.
-- **Rejet thermique non contraint.** À 35 °C, l'eau ressort à 45 °C. Les
-  arrêtés de rejet imposent des limites (température aval, échauffement), et
-  ce sont elles qui provoquent les baisses de production en été, plus que le
-  rendement lui-même.
-- **Caractéristiques par défaut de TESPy.** Les lois `UA_char` et `eta_s_char`
-  ne sont pas calées sur des données constructeur.
-- Le cycle reste simple : sans MSR ni soutirages, la sensibilité réelle sera
-  différente.
-
-## Étapes suivantes
-
-1. Sécheur-surchauffeur entre les corps HP et BP.
-2. Soutirages et réchauffeurs BP/HP, bâche alimentaire.
-3. Contraintes réglementaires de rejet thermique (température aval, échauffement).
+- **Courbe d'échappement BP générique** : c'est l'hypothèse la plus influente sur l'optimum.
+- **Tour simplifiée** : pas de vent, pas de recirculation de panache, pas d'antigel
+  modélisé (l'eau froide est bornée à la plage 0-35 °C).
+- **Production annuelle** : c'est un maximum théorique, sans arrêts ni suivi de charge.
+- **Limites de rejet** : illustratives, et calculées avec un rendement supposé constant à charge partielle.

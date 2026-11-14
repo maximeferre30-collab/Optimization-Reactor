@@ -8,7 +8,7 @@ Sources des ordres de grandeur : caractéristiques publiques du palier N4
 sortie de générateur de vapeur (GV), condenseur à quelques dizaines de mbar.
 """
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass, field
 
 
 @dataclass
@@ -48,6 +48,9 @@ class ParametresRankine:
     vapeur au condenseur que la vraie machine."""
 
     vitesse_annulaire_blocage_m_s: float = 400.0
+
+    facteur_pertes_echappement: float = 1.0
+    """Multiplie la courbe EL(V) générique (étude d'incertitude)."""
     """Vitesse de blocage (ordre de grandeur des courbes SCC)."""
 
     rendement_meca_alternateur: float = 0.985
@@ -64,6 +67,16 @@ class ParametresRankine:
     """Écart T_sat(condenseur) - T_sortie eau de refroidissement
     (« terminal temperature difference » côté chaud, ttd_u dans TESPy)."""
 
+    correction_UA_temperature: bool = True
+    """En offdesign, corrige UA du condenseur selon la température de l'eau
+    (voir condenseur.py). False = UA constant."""
+
+    part_resistance_cote_eau: float = 0.45
+    """Part de la résistance thermique totale située côté eau (tubes) au
+    point de design. Hypothèse : ordre de grandeur 0,4-0,5 pour un
+    condenseur propre ; c'est le paramètre le plus incertain de la
+    correction."""
+
     p_eau_refroidissement_bar: float = 2.0
     """Pression de l'eau de refroidissement (sans influence sur le cycle)."""
 
@@ -75,3 +88,58 @@ class ParametresRankine:
 
     def as_dict(self) -> dict:
         return asdict(self)
+
+
+def _soutirages_defaut() -> dict:
+    return {"RHP2": 30.0, "RHP1": 18.0, "bache": 10.0, "RBP3": 4.0, "RBP2": 1.5, "RBP1": 0.4}
+
+
+@dataclass
+class ParametresN4(ParametresRankine):
+    """Paramètres du cycle complet (cycle_n4.py). Hérite des paramètres du
+    cycle simple (condenseur, échappement, rendements électromécaniques).
+
+    Ordres de grandeur publics du palier N4 utilisés pour le calage :
+    4 270 MWth, ~1 560 MWe brut / ~1 500 MWe net, eau alimentaire ~230 °C,
+    vapeur saturée ~72 bar, turbine Arabelle (corps HP-MP, sécheurs-
+    surchauffeurs, corps BP), températures primaires ~292 / 329 °C.
+    """
+
+    # Primaire (côté chaud du GV)
+    p_primaire_bar: float = 155.0
+    T_primaire_chaud_C: float = 329.0
+    T_primaire_froid_C: float = 292.0
+
+    # GV côté secondaire
+    dp_gv_bar: float = 5.0
+    """Perte de charge eau alimentaire -> vapeur dans le GV (ordre de grandeur)."""
+
+    # Turbines
+    rendement_isentropique_HP: float = 0.89
+    rendement_isentropique_BP: float = 0.91
+    """Rendements isentropiques « vapeur sèche » des tronçons. Le rendement
+    effectif de chaque tronçon est réduit par la règle de Baumann."""
+
+    coefficient_baumann: float = 1.0
+    """Règle de Baumann : eta = eta_sec * (1 - a * y_moy), y_moy humidité
+    moyenne du tronçon (fraction). a ≈ 1 (valeur classique)."""
+
+    dp_admission_HP_bar: float = 3.0
+    """Pertes de charge ligne vapeur + soupapes d'arrêt et de réglage HP."""
+
+    dp_surchauffeur_bar: float = 0.4
+    """Pertes de charge côté vapeur du sécheur-surchauffeur et du crossover."""
+
+    # Soutirages : pression (bar) au point de prélèvement, par réchauffeur
+    p_soutirages_bar: dict = field(default_factory=_soutirages_defaut)
+    """RHP2 et RHP1 sur le corps HP ; « bache » = échappement HP (alimente la
+    bâche et le sécheur-surchauffeur) ; RBP3, RBP2, RBP1 sur le corps BP.
+    Choisies pour une eau alimentaire vers 230 °C et un échauffement réparti."""
+
+    # Échangeurs du poste d'eau
+    ttd_rechauffeurs_K: float = 3.0
+    """T_sat(soutirage) - T_sortie eau des réchauffeurs fermés."""
+    dp_rechauffeurs_HP_bar: float = 1.0
+    dp_rechauffeurs_BP_bar: float = 0.5
+    ttd_surchauffeur_K: float = 20.0
+    """T_sat(vapeur vive) - T_sortie vapeur surchauffée."""

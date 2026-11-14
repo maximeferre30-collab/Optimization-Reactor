@@ -29,6 +29,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from CoolProp.CoolProp import PropsSI
+from scipy.interpolate import PchipInterpolator
 from scipy.optimize import brentq
 
 # Vitesse annulaire (m/s) -> perte d'échappement (kJ/kg de vapeur à l'échappement)
@@ -36,9 +37,12 @@ _V = np.array([60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360, 400])
 _EL = np.array([60, 40, 28, 23, 22, 24, 28, 35, 44, 56, 70, 92])
 
 
+_COURBE = PchipInterpolator(_V, _EL)  # interpolation monotone, sans oscillation
+
+
 def perte_echappement_kJ_kg(V: float) -> float:
     """Perte brute EL(V) de la courbe générique (bornée aux extrémités)."""
-    return float(np.interp(V, _V, _EL))
+    return float(_COURBE(np.clip(V, _V[0], _V[-1])))
 
 
 def facteur_humidite(Y_pourcent: float) -> float:
@@ -87,6 +91,7 @@ def etat_echappement(
     p_cond_Pa: float,
     section_m2: float,
     V_blocage: float,
+    facteur: float = 1.0,
 ) -> EtatEchappement:
     def vitesse(p):
         return m * ligne.volume_massique(p) / section_m2
@@ -94,12 +99,12 @@ def etat_echappement(
     V = vitesse(p_cond_Pa)
     if V <= V_blocage:
         Y = ligne.humidite_pourcent(p_cond_Pa)
-        perte = m * perte_echappement_kJ_kg(V) * facteur_humidite(Y) * 1e3
+        perte = m * facteur * perte_echappement_kJ_kg(V) * facteur_humidite(Y) * 1e3
         return EtatEchappement(V, False, float("nan"), perte / 1e6)
 
     # Écoulement bloqué : la turbine ne « voit » pas en dessous de p*.
     p_star = brentq(lambda p: vitesse(p) - V_blocage, p_cond_Pa, 10 * p_cond_Pa + 1e4)
     Y = ligne.humidite_pourcent(p_star)
     travail_non_recupere = m * (ligne.h(p_star) - ligne.h(p_cond_Pa))
-    perte = travail_non_recupere + m * perte_echappement_kJ_kg(V_blocage) * facteur_humidite(Y) * 1e3
+    perte = travail_non_recupere + m * facteur * perte_echappement_kJ_kg(V_blocage) * facteur_humidite(Y) * 1e3
     return EtatEchappement(V_blocage, True, p_star / 1e5, perte / 1e6)

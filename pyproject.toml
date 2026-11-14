@@ -12,6 +12,8 @@ dependencies = [
     "tespy>=0.12,<0.13",
     "pandas",
     "matplotlib",
+    "scipy",
+    "CoolProp",
 ]
 
 [project.optional-dependencies]
