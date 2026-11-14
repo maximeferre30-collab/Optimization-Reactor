@@ -1,7 +1,7 @@
 <title>Circuit secondaire N4</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 /* Mise en page : dossier d'étude interactif. Bandeau d'ouverture sombre, sommaire latéral collant (grand écran), 4 parties en cartes sur une grille commune. */
 :root {
@@ -210,10 +210,119 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 .timeline .q b { color: var(--fg); font-weight: 600; font-size: 0.78rem; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
 .timeline .num { font-family: var(--f-mono); color: var(--fg); }
 
+/* ===== Charte « note d'étude » : page blanche, IBM Plex, filets fins, sections numérotées ===== */
+:root {
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f4f5f6; --fg: #16181b; --fg-2: #3f454c; --fg-3: #6c737b;
+  --line: #d9dcdf; --grid: #eceef0; --zone: #eef0f2; --accent: #1d4f91; --accent-soft: #eef3fa;
+  --hero-bg: #ffffff; --hero-fg: #16181b; --hero-2: #5b626a; --hero-line: #d9dcdf;
+  --f-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --r: 2px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121416; --surface: #121416; --surface-2: #1b1e21; --fg: #e8eaed; --fg-2: #b9bfc6; --fg-3: #8a9199;
+  --line: #2c3035; --grid: #212529; --zone: #1d2125; --accent: #8db4ea; --accent-soft: #1a2433;
+  --hero-bg: #121416; --hero-fg: #e8eaed; --hero-2: #9aa1a8; --hero-line: #2c3035;
+} }
+:root[data-theme="dark"] {
+  --bg: #121416; --surface: #121416; --surface-2: #1b1e21; --fg: #e8eaed; --fg-2: #b9bfc6; --fg-3: #8a9199;
+  --line: #2c3035; --grid: #212529; --zone: #1d2125; --accent: #8db4ea; --accent-soft: #1a2433;
+  --hero-bg: #121416; --hero-fg: #e8eaed; --hero-2: #9aa1a8; --hero-line: #2c3035;
+}
+body { font-size: 16.5px; line-height: 1.65; }
+h1, h2, h3, .info h4, .timeline h4, details > summary { font-family: var(--f-display); font-stretch: normal; letter-spacing: 0; }
+svg text { font-family: var(--f-display); }
+.eyebrow { font: 500 0.85rem var(--f-display); text-transform: none; letter-spacing: 0; color: var(--fg-3); }
+
+/* En-tête */
+.topbar { background: var(--bg); color: var(--fg); border-bottom: 1px solid var(--line); }
+.me { color: var(--fg); gap: 0; }
+.me span:last-child { display: inline; line-height: 1.4; }
+.me b { font: 600 0.98rem var(--f-display); }
+.me small { color: var(--fg-3); font-size: 0.82rem; }
+.tabs a { color: var(--fg-2); border-radius: 0; padding: 6px 2px; margin: 0 9px; border-bottom: 2px solid transparent; font-family: var(--f-display); font-weight: 500; }
+.tabs a:hover { background: none; color: var(--fg); }
+.tabs a[aria-current="page"] { background: none; color: var(--fg); border-bottom-color: var(--accent); }
+.gh { border: 0; padding: 0; color: var(--fg-2); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Bloc de titre */
+.hero { background: transparent; color: var(--fg); border-bottom: 1px solid var(--fg); }
+.hero-in { padding-block: 44px 30px; gap: 18px; }
+.docmeta { font: 500 0.9rem var(--f-display); color: var(--fg-3); margin: 0; }
+.hero h1 { font: 600 clamp(1.75rem, 3.4vw, 2.5rem)/1.15 var(--f-display); max-width: 32ch; letter-spacing: -0.005em; }
+.resume { font: 600 1rem var(--f-display); margin: 6px 0 -8px; }
+.hero .answer { font: 1.07rem/1.65 var(--f-body); color: var(--fg); max-width: 74ch; }
+.hero .answer b { font-weight: 600; }
+.hero-kpis { border-top: 1px solid var(--fg); border-bottom: 1px solid var(--line); }
+.hero-kpis > div + div { border-left-color: var(--line); }
+.hero-kpis .v { font: 500 1.45rem/1.1 var(--f-mono); }
+.hero-kpis .v small { color: var(--fg-3); }
+.hero-kpis .l { color: var(--fg-2); font: 0.84rem/1.4 var(--f-display); }
+@media (max-width: 760px) { .hero-kpis > div:nth-child(n+3) { border-top-color: var(--line); } }
+.hero-cta { font: 0.95rem var(--f-display); color: var(--fg-3); gap: 4px 14px; align-items: baseline; }
+.hero-cta a { color: var(--accent); text-underline-offset: 3px; }
+
+/* Sections et blocs */
+#tab-etude main { counter-reset: part; }
+.part { counter-increment: part; counter-reset: sub; }
+.part-head { border-bottom: 1px solid var(--fg); padding-bottom: 10px; }
+.part-head h2 { font: 600 1.55rem/1.2 var(--f-display); }
+.part-head h2::before { content: counter(part) ". "; color: var(--accent); }
+.part-head p { font-size: 1rem; }
+.card { background: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 26px 0 0; gap: 14px; }
+.part > .card:first-of-type { border-top: 0; padding-top: 6px; }
+.card h3 { font: 600 1.15rem/1.3 var(--f-display); }
+.card h3.small { font-size: 0.98rem; }
+#tab-etude .card > h3:not(.small)::before, #tab-etude .card > .card-head > div:first-child > h3::before, #tab-etude .card > .stack:first-child > h3::before { counter-increment: sub; content: counter(part) "." counter(sub) "  "; color: var(--fg-3); font-weight: 500; }
+.page { counter-reset: sec; }
+.page .card > h3:not(.small)::before { counter-increment: sec; content: counter(sec) ".  "; color: var(--fg-3); font-weight: 500; }
+.card .sub { font-size: 0.98rem; }
+.card .cap { font: 0.86rem/1.5 var(--f-display); }
+.tile { background: none; border-left: 2px solid var(--line); border-radius: 0; padding: 2px 0 2px 12px; }
+.tile.hl { background: none; border-left-color: var(--accent); }
+.tile .v { font-weight: 500; }
+.tile .l { font-family: var(--f-display); }
+.seg { background: none; border-radius: var(--r); padding: 0; gap: 0; }
+.seg button { border-radius: 0; padding: 5px 12px; font-family: var(--f-display); font-weight: 500; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: none; }
+.legend button { border-radius: var(--r); font-family: var(--f-display); }
+.legend span { font-family: var(--f-display); }
+.btn, .btn.plain { border-radius: var(--r); font-family: var(--f-display); font-weight: 500; }
+.chip { border-radius: var(--r); font: 600 0.75rem var(--f-display); letter-spacing: 0.02em; }
+.callout { background: none; border-left: 2px solid var(--fg); border-radius: 0; padding: 2px 0 2px 16px; font-style: italic; }
+.slider label { font-family: var(--f-display); font-weight: 500; }
+.info { background: none; border-left: 1px solid var(--line); border-radius: 0; padding: 4px 0 4px 18px; }
+.tablewrap { border-radius: 0; border-width: 1px 0; border-color: var(--fg); }
+th { background: none; font: 600 0.8rem var(--f-display); text-transform: none; letter-spacing: 0; color: var(--fg-2); border-bottom: 1px solid var(--fg); }
+td.txt { font-family: var(--f-body); }
+.pill { border-radius: var(--r); font-family: var(--f-display); }
+details { border-radius: 0; border-width: 1px 0 0; background: none; }
+details > summary { padding: 14px 0; font-weight: 600; font-size: 1.02rem; }
+details > .body { padding: 0 0 18px; }
+.formule, math[display="block"] { background: none; border-left: 2px solid var(--line); border-radius: 0; }
+.toc .grp { font: 600 0.8rem var(--f-display); text-transform: none; letter-spacing: 0; color: var(--fg); }
+.toc a { font-family: var(--f-display); }
+.tip { border-radius: var(--r); font-family: var(--f-mono); }
+footer { font-family: var(--f-display); }
+
+/* Onglets secondaires */
+.page-head { border-bottom: 1px solid var(--fg); padding-bottom: 14px; }
+.page-head h1 { font: 600 clamp(1.65rem, 3.2vw, 2.2rem)/1.2 var(--f-display); max-width: 34ch; }
+.page-head p { font-size: 1.02rem; }
+.files button, .viewer, .cmds code { border-radius: var(--r); }
+.files button[aria-pressed="true"] { background: none; border-color: var(--fg); }
+.viewer-head { background: none; }
+.timeline li { padding: 14px 0 16px 38px; border-top: 1px solid var(--line); }
+.timeline li::before { content: counter(etape) "."; width: auto; height: auto; border: 0; border-radius: 0; background: none; display: block; top: 15px; font: 600 1rem var(--f-mono); color: var(--accent); }
+.timeline li::after { display: none; }
+.timeline .q b { font-family: var(--f-display); text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+
 </style>
 
 <div class="topbar"><div class="topbar-in">
-  <a class="me" href="#etude"><span class="avatar" aria-hidden="true">M</span><span><b>Maxime</b><small>Élève ingénieur · IMT</small></span></a>
+  <a class="me" href="#etude"><span><b>Maxime</b> <small>· élève ingénieur, IMT</small></span></a>
   <nav class="tabs" aria-label="Onglets"><a href="#etude" data-tab="etude">Étude</a><a href="#thermo" data-tab="thermo">Thermodynamique</a><a href="#code" data-tab="code">Code</a><a href="#demarche" data-tab="demarche">Démarche</a></nav>
   <a class="gh" href="https://github.com/maximeferre30-collab/Optimization-Reactor">Code sur GitHub</a>
 </div></div>
@@ -221,11 +330,12 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 <div class="tab" id="tab-etude">
 <header class="hero">
   <div class="hero-in">
-    <span class="eyebrow">Projet personnel · thermique des centrales nucléaires · REP N4</span>
-    <h1>Que coûte un degré d'eau en plus au condenseur&nbsp;?</h1>
+    <p class="docmeta">Note d'étude · Maxime, élève ingénieur IMT · novembre 2026</p>
+    <h1>Sensibilité d'une tranche REP N4 à la température de sa source froide</h1>
+    <h2 class="resume">Résumé</h2>
     <p class="answer" id="answer"></p>
     <div class="hero-kpis" id="hero-kpis"></div>
-    <div class="hero-cta"><a class="btn primary" href="#explorer">Explorer le résultat</a><a class="btn" href="#schema-card">Voir le circuit</a><a class="btn" href="#clapeyron">Voir la démonstration</a><a class="btn" href="#meteo-calc">Tester une météo</a></div>
+    <p class="hero-cta">Aller à : <a href="#explorer">résultat interactif</a> · <a href="#schema-card">schéma du circuit</a> · <a href="#clapeyron">démonstration à la main</a> · <a href="#meteo-calc">calculateur météo</a></p>
   </div>
 </header>
 
@@ -239,7 +349,7 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 
   <main>
     <section class="part" aria-labelledby="p1">
-      <div class="part-head"><span class="num">Partie 1</span><h2 id="p1">Le résultat</h2><p>Même installation, même puissance du réacteur : seule la température de l'eau qui entre au condenseur change. Déplacez le curseur, ou cliquez sur la courbe.</p></div>
+      <div class="part-head"><h2 id="p1">Le résultat</h2><p>Même installation, même puissance du réacteur : seule la température de l'eau qui entre au condenseur change. Déplacez le curseur, ou cliquez sur la courbe.</p></div>
       <article class="card" id="explorer">
         <div class="explore">
           <div class="slider"><label for="teau">Température de l'eau au condenseur <output id="tval">15 °C</output></label><input type="range" id="teau" min="0" max="35" step="1" value="15"></div>
@@ -258,7 +368,7 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </section>
 
     <section class="part" aria-labelledby="p2">
-      <div class="part-head"><span class="num">Partie 2</span><h2 id="p2">Le modèle</h2><p>Un cycle N4 complet : turbine HP, sécheur-surchauffeur, turbine BP, six étages de réchauffage, et le côté primaire du générateur de vapeur.</p></div>
+      <div class="part-head"><h2 id="p2">Le modèle</h2><p>Un cycle N4 complet : turbine HP, sécheur-surchauffeur, turbine BP, six étages de réchauffage, et le côté primaire du générateur de vapeur.</p></div>
       <article class="card" id="schema-card">
         <div class="card-head"><div><h3>Cliquez sur un composant pour l'inspecter</h3><p class="sub">Épaisseur des traits proportionnelle au débit. Orange : vapeur. Bleu : eau. Pointillés jaunes : soutirages. Vert : eau de refroidissement.</p></div>
           <button class="btn plain" id="anim" aria-pressed="true">Mettre en pause</button></div>
@@ -276,7 +386,7 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </section>
 
     <section class="part" aria-labelledby="p3">
-      <div class="part-head"><span class="num">Partie 3</span><h2 id="p3">Dans le monde réel</h2><p>Le N4 est refroidi par des tours : la température de l'eau dépend de l'air, et surtout de son humidité. Chaîne de calcul : air → tour (Merkel, tirage naturel) → eau au condenseur → puissance.</p></div>
+      <div class="part-head"><h2 id="p3">Dans le monde réel</h2><p>Le N4 est refroidi par des tours : la température de l'eau dépend de l'air, et surtout de son humidité. Chaîne de calcul : air → tour (Merkel, tirage naturel) → eau au condenseur → puissance.</p></div>
       <article class="card" id="meteo-calc">
         <div class="card-head"><div><h3>Calculateur : quelle puissance par ce temps-là&nbsp;?</h3><p class="sub">Réglez l'air extérieur ou cliquez sur la carte. La tour et la centrale sont couplées, avec les mêmes modèles que l'étude annuelle.</p></div>
           <div class="seg" role="group" aria-label="Site" id="seg-site-calc"><button aria-pressed="true" data-v="chooz">Chooz</button><button aria-pressed="false" data-v="civaux">Civaux</button></div></div>
@@ -310,7 +420,7 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </section>
 
     <section class="part" aria-labelledby="p4">
-      <div class="part-head"><span class="num">Partie 4</span><h2 id="p4">Ce que valent ces chiffres</h2><p>Le modèle est validé contre les données publiques et contrôlé par 26 tests automatiques. Ses hypothèses incertaines ont été propagées par Monte-Carlo.</p></div>
+      <div class="part-head"><h2 id="p4">Ce que valent ces chiffres</h2><p>Le modèle est validé contre les données publiques et contrôlé par 30 tests automatiques. Ses hypothèses incertaines ont été propagées par Monte-Carlo.</p></div>
       <article class="card" id="valid-card">
         <div class="stack"><h3>Le modèle retrouve la tranche réelle à 2 % près, sans calage</h3><p class="sub">Les paramètres sont des valeurs d'ingénierie usuelles. L'écart restant vient de ce que le modèle ignore : fuites aux garnitures, purges des GV, vapeur auxiliaire.</p></div>
         <div class="tablewrap"><table id="tab-valid"></table></div>
@@ -349,13 +459,11 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 <div class="tab" id="tab-thermo" hidden>
   <div class="page">
     <header class="page-head">
-      <span class="eyebrow">Thermodynamique</span>
       <h1>Comprendre les chiffres, pas seulement les calculer</h1>
       <p>Chaque résultat important du modèle est redémontré ici à la main, avec les relations de base de la thermodynamique, puis confronté au calcul numérique. Quand les deux divergent, l'écart a une cause physique identifiée.</p>
     </header>
 
     <article class="card" id="clapeyron">
-      <span class="eyebrow">1 · Sensibilité au condenseur</span>
       <h3>Pourquoi un degré de plus au condenseur coûte environ 7 MW : la démonstration par Clapeyron</h3>
       <div class="grid2">
         <div class="deriv">
@@ -378,7 +486,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </article>
 
     <article class="card" id="tmoy">
-      <span class="eyebrow">2 · Rendement</span>
       <h3>Pourquoi le réchauffage fait gagner 5 points : la température moyenne entropique</h3>
       <div class="grid2">
         <div class="deriv">
@@ -391,7 +498,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </article>
 
     <article class="card" id="pincement">
-      <span class="eyebrow">3 · Échangeurs</span>
       <h3>Les pincements : là où l'échange de chaleur est limité</h3>
       <p class="sub">Profils de température le long des échangeurs (diagramme T-Q). L'écart minimal entre les deux fluides, le pincement, fixe ce qu'un échangeur peut transmettre avec une surface donnée.</p>
       <div class="grid2">
@@ -401,7 +507,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </article>
 
     <article class="card" id="mollier">
-      <span class="eyebrow">4 · Turbines</span>
       <h3>Les détentes dans le diagramme de Mollier</h3>
       <p class="sub">Chaque tronçon de turbine s'écarte de la détente isentropique (verticale en pointillés) d'autant plus que la vapeur est humide : c'est la règle de Baumann. Le sécheur-surchauffeur ramène la vapeur dans la zone sèche avant la turbine BP. Survolez un tronçon.</p>
       <div class="legend"><span><i style="border-color:var(--s1)"></i>turbine HP</span><span><i style="border-color:var(--s2)"></i>sécheur-surchauffeur</span><span><i style="border-color:var(--s3)"></i>turbine BP</span><span><i class="dash" style="border-color:var(--fg-3)"></i>détente isentropique</span></div>
@@ -409,7 +514,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
     </article>
 
     <article class="card">
-      <span class="eyebrow">5 · Ordres de grandeur</span>
       <h3>Les chiffres à avoir en tête</h3>
       <div class="tablewrap"><table id="tab-odg"></table></div>
     </article>
@@ -420,7 +524,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 <div class="tab" id="tab-code" hidden>
   <div class="page wide">
     <header class="page-head">
-      <span class="eyebrow">Code source</span>
       <h1 id="code-titre">Le code</h1>
       <p>Python, TESPy pour la résolution du réseau, CoolProp pour les propriétés de l'eau et de l'air humide. Chaque modèle physique a son module, et chaque module a ses tests. Les fichiers ci-dessous sont ceux qui portent la physique du projet.</p>
       <div class="cmds"><code>pip install -r requirements.txt</code><code>pytest</code><code>python scripts/figures_rapport.py</code></div>
@@ -439,7 +542,6 @@ math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; pa
 <div class="tab" id="tab-demarche" hidden>
   <div class="page">
     <header class="page-head">
-      <span class="eyebrow">Démarche</span>
       <h1>Comment le modèle a été construit, corrigé et validé</h1>
       <p>Le point de départ était une question d'élève ingénieur : pourquoi la production d'une centrale baisse-t-elle quand il fait chaud, et de combien ? La réponse a demandé dix itérations. Chacune a commencé par un résultat qui ne tenait pas debout.</p>
     </header>
@@ -652,7 +754,7 @@ for (const n of ["RBP1", "RBP2", "RBP3", "RHP1", "RHP2"]) FICHES[n] = { t: `Réc
 const EXMAX = Math.max(...Object.values(Ex.destructions_MW));
 function fiche(k) {
   const f = FICHES[k], ex = f.ex ? somme(f.ex, "ExD_MW") : f.exv ? f.exv() : null, E = Ex.exergie_primaire_MW;
-  $("info").innerHTML = `<span class="eyebrow">Composant sélectionné</span><h4>${esc(f.t)}</h4><p>${esc(f.r)}</p><dl class="kv">${f.kv().map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>` +
+  $("info").innerHTML = `<h4>${esc(f.t)}</h4><p>${esc(f.r)}</p><dl class="kv">${f.kv().map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>` +
     (ex != null ? `<div class="stack" style="gap:6px"><dl class="kv"><dt>Exergie détruite</dt><dd>${fr(ex, 1)} MW · ${fr(100 * ex / E, 1)} %</dd></dl><div class="bar-mini" title="relative au plus gros poste"><i style="width:${Math.min(100, 100 * ex / EXMAX)}%"></i></div></div>` : "");
   document.querySelectorAll(".comp").forEach((g) => g.classList.toggle("sel", g.dataset.k === k));
 }
