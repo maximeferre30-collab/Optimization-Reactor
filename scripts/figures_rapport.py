@@ -176,7 +176,31 @@ def main() -> None:
         composants[nom] = d
     debits = {lbl: round(float(c.m.val), 2) for lbl, c in n4.c.items()}
 
-    # 8) Données du rapport interactif
+    # 8) Analyses thermodynamiques à la main
+    from rep_secondaire.analyse_thermo import (
+        analyse_temperatures_moyennes, chemin_hs_n4, decomposition_sensibilite,
+        profil_TQ_condenseur, profil_TQ_gv,
+    )
+    thermo = {
+        "decomposition": decomposition_sensibilite(replace(pN4), RES / "decomp.json"),
+        "T_moyennes": {"n4": analyse_temperatures_moyennes(n4, "0", "1"),
+                       "simple": analyse_temperatures_moyennes(simple, "0", "1")},
+        "TQ_gv": profil_TQ_gv(n4), "TQ_condenseur": profil_TQ_condenseur(n4),
+        "mollier": chemin_hs_n4(n4),
+        "dTc_dTeau": float(np.polyfit(df.index[15:], df["T_condenseur_C"].values[15:], 1)[0]),
+    }
+
+    # 9) Code source affiché dans le rapport
+    sources = {}
+    for rel in ("src/rep_secondaire/cycle_n4.py", "src/rep_secondaire/analyse_thermo.py",
+                "src/rep_secondaire/echappement.py", "src/rep_secondaire/tour.py",
+                "src/rep_secondaire/exergie.py", "src/rep_secondaire/condenseur.py",
+                "src/rep_secondaire/annuel.py", "src/rep_secondaire/incertitudes.py",
+                "tests/test_analyse_thermo.py", "tests/test_cycle_n4.py",
+                "tests/test_verification_independante.py"):
+        sources[rel] = (RACINE / rel).read_text(encoding="utf-8")
+
+    # 10) Données du rapport interactif
     cols = ["p_condenseur_mbar", "T_condenseur_C", "T_sortie_eau_refroidissement_C",
             "vitesse_annulaire_m_s", "echappement_bloque", "perte_echappement_MW",
             "debit_vapeur_kg_s", "puissance_electrique_nette_MW", "rendement_net",
@@ -219,6 +243,8 @@ def main() -> None:
                    "limites": asdict(lim)},
         "incertitudes": st,
         "composants": composants,
+        "thermo": thermo,
+        "sources": sources,
         "debits": debits,
         "tables_tour": tables,
         "cartes": {site: {"annees": [int(a) for a in c.index],

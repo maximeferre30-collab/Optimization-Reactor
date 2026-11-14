@@ -27,10 +27,12 @@ def main() -> None:
     donnees = DONNEES.read_text(encoding="utf-8")
     marque = "/*__DONNEES__*/null"
     assert marque in gabarit, "marqueur de données absent du gabarit"
-    corps = gabarit.replace(marque, donnees)
+    # « </ » échappé : le JSON (qui contient du code source) est inséré dans
+    # une balise <script>, qu'une séquence « </script> » fermerait.
+    corps = gabarit.replace(marque, donnees.replace("</", "<\\/"))
     # Le gabarit est un fragment (format des pages publiées) : on l'enveloppe
     # d'un squelette HTML complet pour l'ouvrir directement dans un navigateur.
-    debut_corps = '<header class="hero">'
+    debut_corps = '<div class="topbar">'
     assert debut_corps in corps, "début du corps de page introuvable dans le gabarit"
     SORTIE.write_text(ENTETE + corps.replace(debut_corps, "</head>\n<body>\n" + debut_corps, 1)
                       + "\n</body>\n</html>\n", encoding="utf-8")

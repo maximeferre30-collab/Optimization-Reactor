@@ -15,6 +15,7 @@
   --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --r: 10px;
+  --k-kw: #6250d6; --k-str: #1a7f4b; --k-com: #6b7581; --k-num: #b4541a; --k-fn: #1f5fae; --k-meta: #8a5300;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f1318; --surface: #171c22; --surface-2: #1d242c; --fg: #edf1f5; --fg-2: #b4bcc6; --fg-3: #8a939e;
@@ -23,6 +24,7 @@
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --dome: #6d7580;
   --q1: #184f95; --q2: #256abf; --q3: #3987e5; --q4: #86b6ef; --q5: #cde2fb;
   --warn-bg: #3a2a10; --warn-fg: #f2c27a; --ok: #199e70; color-scheme: dark;
+  --k-kw: #b3a8f5; --k-str: #7fd7a6; --k-com: #8a939e; --k-num: #f0a070; --k-fn: #8fbdf2; --k-meta: #f2c27a;
 } }
 :root[data-theme="dark"] {
   --bg: #0f1318; --surface: #171c22; --surface-2: #1d242c; --fg: #edf1f5; --fg-2: #b4bcc6; --fg-3: #8a939e;
@@ -31,6 +33,7 @@
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --dome: #6d7580;
   --q1: #184f95; --q2: #256abf; --q3: #3987e5; --q4: #86b6ef; --q5: #cde2fb;
   --warn-bg: #3a2a10; --warn-fg: #f2c27a; --ok: #199e70; color-scheme: dark;
+  --k-kw: #b3a8f5; --k-str: #7fd7a6; --k-com: #8a939e; --k-num: #f0a070; --k-fn: #8fbdf2; --k-meta: #f2c27a;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -150,15 +153,79 @@ ul.items li { display: grid; gap: 2px; } ul.items li b { font-weight: 600; } ul.
 footer { color: var(--fg-3); font-size: 0.84rem; padding-top: 8px; border-top: 1px solid var(--line); display: grid; gap: 4px; }
 a { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* --- En-tête personnel et onglets --- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--hero-bg); }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--hero-bg); color: var(--hero-fg); border-bottom: 1px solid var(--hero-line); }
+.topbar-in { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+.me { display: flex; align-items: center; gap: 10px; color: var(--hero-fg); text-decoration: none; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 700 0.95rem var(--f-display); background: var(--hero-fg); color: var(--hero-bg); }
+.me span:last-child { display: grid; line-height: 1.15; } .me b { font: 700 0.98rem var(--f-display); font-stretch: 90%; } .me small { color: var(--hero-2); font-size: 0.78rem; }
+.tabs { display: flex; gap: 2px; flex-wrap: wrap; margin-left: auto; }
+.tabs a { color: var(--hero-2); text-decoration: none; font: 600 0.9rem var(--f-body); padding: 7px 12px; border-radius: 6px; }
+.tabs a:hover { color: var(--hero-fg); background: rgb(255 255 255 / 0.06); }
+.tabs a[aria-current="page"] { color: var(--hero-bg); background: var(--hero-fg); }
+.gh { color: var(--hero-2); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--hero-line); padding: 5px 10px; border-radius: 6px; }
+.gh:hover { color: var(--hero-fg); }
+@media (max-width: 720px) { .tabs { margin-left: 0; width: 100%; } .gh { display: none; } }
+.tab[hidden] { display: none !important; }
+.toc { top: calc(env(safe-area-inset-top, 0px) + 84px); }
+.card, #annexes { scroll-margin-top: 90px; }
+.page { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 72px; display: grid; gap: 24px; }
+.page.wide { max-width: 1240px; }
+.page-head { display: grid; gap: 10px; padding-bottom: 8px; }
+.page-head h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.01em; max-width: 24ch; }
+.page-head p { color: var(--fg-2); font-size: 1.05rem; max-width: 70ch; }
+/* --- Démonstrations --- */
+.deriv { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.deriv p { color: var(--fg-2); font-size: 0.95rem; }
+.deriv p b { color: var(--fg); }
+math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 1.12rem; color: var(--fg); }
+/* --- Code --- */
+.cmds { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmds code { font: 0.85rem var(--f-mono); background: var(--surface); border: 1px solid var(--line); padding: 5px 10px; border-radius: 6px; }
+.code-wrap { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .code-wrap { grid-template-columns: minmax(0, 1fr); } }
+.files { display: grid; gap: 6px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+.files button { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; display: grid; gap: 3px; color: var(--fg); font: inherit; }
+.files button b { font: 600 0.85rem var(--f-mono); }
+.files button span { font-size: 0.8rem; color: var(--fg-2); line-height: 1.35; }
+.files button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.files .grp { font: 600 0.7rem var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); margin-top: 8px; }
+.viewer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-width: 0; overflow: hidden; }
+.viewer-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.code { display: grid; grid-template-columns: auto minmax(0, 1fr); max-height: 78vh; overflow: auto; font: 12.5px/1.6 var(--f-mono); }
+.code pre { margin: 0; padding: 12px 14px; white-space: pre; }
+.code .gut { color: var(--fg-3); text-align: right; user-select: none; border-right: 1px solid var(--line); background: var(--surface-2); position: sticky; left: 0; }
+.code .src { color: var(--fg); tab-size: 4; }
+.hljs-keyword, .hljs-built_in { color: var(--k-kw); font-weight: 600; } .hljs-string { color: var(--k-str); } .hljs-comment, .hljs-doctag { color: var(--k-com); font-style: italic; }
+.hljs-number, .hljs-literal { color: var(--k-num); } .hljs-title, .hljs-title.function_, .hljs-title.class_ { color: var(--k-fn); font-weight: 600; } .hljs-meta { color: var(--k-meta); } .hljs-params { color: var(--fg); } .hljs-subst { color: var(--fg); }
+/* --- Démarche --- */
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: etape; }
+.timeline li { position: relative; padding: 0 0 22px 46px; counter-increment: etape; }
+.timeline li::before { content: counter(etape); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 0.82rem var(--f-mono); background: var(--surface); border: 1.5px solid var(--accent); color: var(--accent); }
+.timeline li::after { content: ""; position: absolute; left: 14.5px; top: 32px; bottom: 2px; width: 1.5px; background: var(--line); }
+.timeline li:last-child::after { display: none; }
+.timeline h4 { margin: 3px 0 6px; font: 700 1.08rem var(--f-display); font-stretch: 88%; }
+.timeline .q { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; font-size: 0.94rem; color: var(--fg-2); }
+.timeline .q b { color: var(--fg); font-weight: 600; font-size: 0.78rem; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+.timeline .num { font-family: var(--f-mono); color: var(--fg); }
+
 </style>
 
+<div class="topbar"><div class="topbar-in">
+  <a class="me" href="#etude"><span class="avatar" aria-hidden="true">M</span><span><b>Maxime</b><small>Élève ingénieur · IMT</small></span></a>
+  <nav class="tabs" aria-label="Onglets"><a href="#etude" data-tab="etude">Étude</a><a href="#thermo" data-tab="thermo">Thermodynamique</a><a href="#code" data-tab="code">Code</a><a href="#demarche" data-tab="demarche">Démarche</a></nav>
+  <a class="gh" href="https://github.com/maximeferre30-collab/Optimization-Reactor">Code sur GitHub</a>
+</div></div>
+
+<div class="tab" id="tab-etude">
 <header class="hero">
   <div class="hero-in">
-    <span class="eyebrow">REP palier N4 · circuit secondaire · modèle TESPy</span>
+    <span class="eyebrow">Projet personnel · thermique des centrales nucléaires · REP N4</span>
     <h1>Que coûte un degré d'eau en plus au condenseur&nbsp;?</h1>
     <p class="answer" id="answer"></p>
     <div class="hero-kpis" id="hero-kpis"></div>
-    <div class="hero-cta"><a class="btn primary" href="#explorer">Explorer le résultat</a><a class="btn" href="#schema-card">Voir le circuit</a><a class="btn" href="#meteo-calc">Tester une météo</a></div>
+    <div class="hero-cta"><a class="btn primary" href="#explorer">Explorer le résultat</a><a class="btn" href="#schema-card">Voir le circuit</a><a class="btn" href="#clapeyron">Voir la démonstration</a><a class="btn" href="#meteo-calc">Tester une météo</a></div>
   </div>
 </header>
 
@@ -270,13 +337,125 @@ a { color: var(--accent); }
         <details><summary>Tableau des états thermodynamiques</summary><div class="body"><div class="tablewrap"><table id="tab-etats"></table></div></div></details>
       </div>
       <footer>
-        <span>Généré par <span class="mono">scripts/rapport_html.py</span> à partir de <span class="mono">results/rapport_donnees.json</span>.</span>
-        <span>Eau et air humide : CoolProp (IAPWS-95). Solveur : TESPy 0.12. Météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0).</span>
+        <span>Projet réalisé par Maxime, élève ingénieur à l'IMT. Code et méthode : onglets <a href="#code">Code</a> et <a href="#demarche">Démarche</a>.</span>
+        <span>Eau et air humide : CoolProp (IAPWS-95). Solveur : TESPy 0.12. Météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0). Un assistant d'IA a servi d'aide à la programmation.</span>
       </footer>
     </section>
   </main>
 </div>
+</div>
 
+<!-- ===================== ONGLET THERMODYNAMIQUE ===================== -->
+<div class="tab" id="tab-thermo" hidden>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow">Thermodynamique</span>
+      <h1>Comprendre les chiffres, pas seulement les calculer</h1>
+      <p>Chaque résultat important du modèle est redémontré ici à la main, avec les relations de base de la thermodynamique, puis confronté au calcul numérique. Quand les deux divergent, l'écart a une cause physique identifiée.</p>
+    </header>
+
+    <article class="card" id="clapeyron">
+      <span class="eyebrow">1 · Sensibilité au condenseur</span>
+      <h3>Pourquoi un degré de plus au condenseur coûte environ 7 MW : la démonstration par Clapeyron</h3>
+      <div class="grid2">
+        <div class="deriv">
+          <p><b>Travail perdu sur le dernier étage.</b> À entropie fixée, la relation de Gibbs donne la variation d'enthalpie de fin de détente quand la pression d'échappement monte :</p>
+          <math display="block"><mi>d</mi><mi>h</mi><mo>=</mo><mi>T</mi><mi>d</mi><mi>s</mi><mo>+</mo><mi>v</mi><mi>d</mi><mi>p</mi><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>η</mi><mspace width="0.2em"/><mover><mi>m</mi><mo>˙</mo></mover><mspace width="0.2em"/><msub><mi>v</mi><mi>s</mi></msub><mspace width="0.2em"/><mi>d</mi><mi>p</mi></math>
+          <p><b>Lien pression-température à saturation</b> (Clapeyron), avec <i>v<sub>f</sub></i> ≪ <i>v<sub>g</sub></i> et <i>v<sub>s</sub></i> ≈ <i>x v<sub>g</sub></i> :</p>
+          <math display="block"><mfrac><mrow><mi>d</mi><mi>p</mi></mrow><mrow><mi>d</mi><mi>T</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>h</mi><mrow><mi>f</mi><mi>g</mi></mrow></msub><mrow><mi>T</mi><mo>(</mo><msub><mi>v</mi><mi>g</mi></msub><mo>−</mo><msub><mi>v</mi><mi>f</mi></msub><mo>)</mo></mrow></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mfrac><mrow><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover></mrow><mrow><mi>d</mi><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac><mo>≈</mo><mo>−</mo><mfrac><mrow><mi>η</mi><mspace width="0.2em"/><mover><mi>m</mi><mo>˙</mo></mover><mspace width="0.2em"/><mi>x</mi><mspace width="0.2em"/><msub><mi>h</mi><mrow><mi>f</mi><mi>g</mi></mrow></msub></mrow><msub><mi>T</mi><mi>c</mi></msub></mfrac><mo>=</mo><mo>−</mo><mfrac><mrow><mi>η</mi><mspace width="0.2em"/><msub><mover><mi>Q</mi><mo>˙</mo></mover><mtext>lat</mtext></msub></mrow><msub><mi>T</mi><mi>c</mi></msub></mfrac></math>
+          <p>C'est la forme « de terrain » de <i>dW = −Q dT/T</i> : la chaleur rejetée au condenseur, multipliée par la hausse relative de sa température absolue, et pondérée par le rendement du dernier étage.</p>
+          <p><b>Crédit de régénération.</b> Un condensat plus chaud de <i>dT</i> demande moins de vapeur au réchauffeur RBP1 :</p>
+          <math display="block"><mi>d</mi><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>x</mi></msub><mo>=</mo><mfrac><mrow><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>c</mi></msub><mspace width="0.2em"/><msub><mi>c</mi><mi>p</mi></msub><mspace width="0.2em"/><mi>d</mi><mi>T</mi></mrow><mrow><msub><mi>h</mi><mi>x</mi></msub><mo>−</mo><msub><mi>h</mi><mtext>purge</mtext></msub></mrow></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover><mo>=</mo><mi>d</mi><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>x</mi></msub><mo>(</mo><msub><mi>h</mi><mrow><mi>e</mi><mn>6</mn></mrow></msub><mo>−</mo><msub><mi>h</mi><mn>2</mn></msub><mo>)</mo></math>
+          <p>Cette vapeur épargnée poursuit sa détente jusqu'au condenseur : le cycle à soutirages compense donc une partie de la perte.</p>
+        </div>
+        <div class="stack">
+          <div class="tablewrap"><table id="tab-clap"></table></div>
+          <h3 class="small">Décomposition de la pente, eau entre 15 et 20 °C (MW par K de condensation)</h3>
+          <div class="chart" id="ch-wf"></div>
+          <p class="cap" id="cap-wf"></p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="tmoy">
+      <span class="eyebrow">2 · Rendement</span>
+      <h3>Pourquoi le réchauffage fait gagner 5 points : la température moyenne entropique</h3>
+      <div class="grid2">
+        <div class="deriv">
+          <p>Un cycle qui reçoit sa chaleur entre l'eau alimentaire (état 0) et la vapeur vive (état 1) se compare à un cycle réversible qui la recevrait à une température unique :</p>
+          <math display="block"><msub><mover><mi>T</mi><mo>‾</mo></mover><mtext>apport</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>−</mo><msub><mi>h</mi><mn>0</mn></msub></mrow><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>−</mo><msub><mi>s</mi><mn>0</mn></msub></mrow></mfrac><mspace width="2em"/><msub><mi>η</mi><mtext>endo</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mover><mi>T</mi><mo>‾</mo></mover><mtext>apport</mtext></msub></mfrac></math>
+          <p id="txt-tm"></p>
+        </div>
+        <div class="stack"><div class="chart" id="ch-tm"></div><p class="cap">Carnot : chaleur reçue à la température de la vapeur vive. Endoréversible : chaleur reçue à T̄. Réel : rendement du modèle.</p></div>
+      </div>
+    </article>
+
+    <article class="card" id="pincement">
+      <span class="eyebrow">3 · Échangeurs</span>
+      <h3>Les pincements : là où l'échange de chaleur est limité</h3>
+      <p class="sub">Profils de température le long des échangeurs (diagramme T-Q). L'écart minimal entre les deux fluides, le pincement, fixe ce qu'un échangeur peut transmettre avec une surface donnée.</p>
+      <div class="grid2">
+        <div class="stack"><h3 class="small" id="t-tq-gv"></h3><div class="legend"><span><i style="border-color:var(--s2)"></i>primaire</span><span><i style="border-color:var(--s1)"></i>secondaire</span></div><div class="chart" id="ch-tq-gv"></div><p class="cap">Le pincement apparaît au début de l'ébullition : c'est lui qui fixe la pression de vapeur pour une température primaire donnée, d'où l'intérêt de préchauffer l'eau alimentaire.</p></div>
+        <div class="stack"><h3 class="small" id="t-tq-cond"></h3><div class="legend"><span><i style="border-color:var(--s2)"></i>vapeur qui condense</span><span><i style="border-color:var(--s3)"></i>eau de refroidissement</span></div><div class="chart" id="ch-tq-cond"></div><p class="cap">La vapeur condense à température constante, et le pincement se trouve à la sortie de l'eau. Toute hausse de l'eau d'entrée se répercute presque degré pour degré sur la condensation (pente calculée : <span id="dtc"></span>).</p></div>
+      </div>
+    </article>
+
+    <article class="card" id="mollier">
+      <span class="eyebrow">4 · Turbines</span>
+      <h3>Les détentes dans le diagramme de Mollier</h3>
+      <p class="sub">Chaque tronçon de turbine s'écarte de la détente isentropique (verticale en pointillés) d'autant plus que la vapeur est humide : c'est la règle de Baumann. Le sécheur-surchauffeur ramène la vapeur dans la zone sèche avant la turbine BP. Survolez un tronçon.</p>
+      <div class="legend"><span><i style="border-color:var(--s1)"></i>turbine HP</span><span><i style="border-color:var(--s2)"></i>sécheur-surchauffeur</span><span><i style="border-color:var(--s3)"></i>turbine BP</span><span><i class="dash" style="border-color:var(--fg-3)"></i>détente isentropique</span></div>
+      <div class="chart" id="ch-hs"></div>
+    </article>
+
+    <article class="card">
+      <span class="eyebrow">5 · Ordres de grandeur</span>
+      <h3>Les chiffres à avoir en tête</h3>
+      <div class="tablewrap"><table id="tab-odg"></table></div>
+    </article>
+  </div>
+</div>
+
+<!-- ===================== ONGLET CODE ===================== -->
+<div class="tab" id="tab-code" hidden>
+  <div class="page wide">
+    <header class="page-head">
+      <span class="eyebrow">Code source</span>
+      <h1 id="code-titre">Le code</h1>
+      <p>Python, TESPy pour la résolution du réseau, CoolProp pour les propriétés de l'eau et de l'air humide. Chaque modèle physique a son module, et chaque module a ses tests. Les fichiers ci-dessous sont ceux qui portent la physique du projet.</p>
+      <div class="cmds"><code>pip install -r requirements.txt</code><code>pytest</code><code>python scripts/figures_rapport.py</code></div>
+    </header>
+    <div class="code-wrap">
+      <nav class="files" id="files" aria-label="Fichiers"></nav>
+      <article class="viewer">
+        <div class="viewer-head"><div class="stack" style="gap:2px"><span class="mono" id="v-path"></span><span class="cap" id="v-note"></span></div><span class="cap mono" id="v-lines"></span></div>
+        <div class="code" id="v-code"></div>
+      </article>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ONGLET DÉMARCHE ===================== -->
+<div class="tab" id="tab-demarche" hidden>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow">Démarche</span>
+      <h1>Comment le modèle a été construit, corrigé et validé</h1>
+      <p>Le point de départ était une question d'élève ingénieur : pourquoi la production d'une centrale baisse-t-elle quand il fait chaud, et de combien ? La réponse a demandé dix itérations. Chacune a commencé par un résultat qui ne tenait pas debout.</p>
+    </header>
+    <ol class="timeline" id="timeline"></ol>
+    <article class="card">
+      <h3>Ce que j'en retiens</h3>
+      <ul class="items" id="retiens"></ul>
+    </article>
+    <article class="card">
+      <h3>Outils et transparence</h3>
+      <p class="sub">Python 3.12, TESPy 0.12 (résolution de réseaux thermiques), CoolProp (IAPWS-95 et air humide), pandas, SciPy, matplotlib. Données météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0). Un assistant d'IA a servi d'aide à la programmation. Les choix de modélisation, les vérifications et l'interprétation des résultats sont détaillés ci-dessus, et chacun est couvert par un test.</p>
+    </article>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 const D = /*__DONNEES__*/null;
 const fr = (v, d = 0) => v == null || Number.isNaN(+v) ? "—" : Number(v).toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -664,4 +843,213 @@ function rejets() {
 })();
 
 maj(); calc(); annee(); rejets();
+
+/* ================= ONGLET THERMODYNAMIQUE ================= */
+const TH = D.thermo;
+(function clapeyron() {
+  const c = TH.decomposition.details_clapeyron, d = TH.decomposition;
+  $("tab-clap").innerHTML = `<thead><tr><th>grandeur au design</th><th>valeur</th></tr></thead><tbody>` + [
+    ["Rendement du dernier tronçon BP, η", fr(c.eta_dernier_etage, 3)], ["Titre à l'échappement, x", fr(c.titre_echappement, 3)],
+    ["Débit à l'échappement, ṁ", `${fr(c.debit_echappement_kg_s)} kg/s`], ["Chaleur latente, h_fg", `${fr(c.h_fg_kJ_kg)} kJ/kg`],
+    ["Chaleur latente cédée, Q̇_lat", `${fr(c.Q_latent_MW)} MW`], ["Température de condensation, T_c", `${fr(c.T_condensation_C + 273.15, 1)} K`],
+    ["dp/dT à saturation : Clapeyron / CoolProp", `${fr(c.clapeyron_dp_dT_Pa_K, 1)} / ${fr(c.coolprop_dp_dT_Pa_K, 1)} Pa/K`],
+    ["Estimation −η Q̇_lat / T_c (× rendement alternateur)", `${fr(d.clapeyron, 2)} MW/K`],
+  ].map(([a, b]) => `<tr><td class="txt">${a}</td><td>${b}</td></tr>`).join("") + `</tbody>`;
+  // Graphique en cascade
+  const etapes = [["Clapeyron", d.clapeyron, "delta"], ["Crédit régénératif", d.credit_regeneratif, "delta"], ["Autres effets", d.residu_autres_effets, "delta"], ["Modèle sans pertes éch.", d.modele_sans_pertes, "total"], ["Pertes d'échappement", d.effet_pertes_echappement, "delta"], ["Modèle complet", d.modele_complet, "total"]];
+  const W = 460, H = 280, m = { l: 44, r: 10, t: 14, b: 58 }, n = etapes.length, bw = (W - m.l - m.r) / n;
+  const lo = Math.min(0, d.clapeyron) * 1.1, hi = 0.6, Y = (v) => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Décomposition de la sensibilité">`, run = 0;
+  for (const t of niceTicks(lo, hi, 5)) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text class="tick" x="${m.l - 6}" y="${Y(t) + 3.5}" text-anchor="end">${fr(t)}</text>`;
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--fg-3)"/>`;
+  etapes.forEach(([nom, v, k], i) => {
+    let a, b, col;
+    if (k === "total") { a = 0; b = v; run = v; col = "--s1"; } else { a = run; b = run + v; run = b; col = v < 0 ? "--s2" : "--s3"; }
+    const x = m.l + i * bw + bw * 0.18, w = bw * 0.64;
+    s += `<rect class="bar" data-i="${i}" x="${x}" y="${Math.min(Y(a), Y(b))}" width="${w}" height="${Math.max(Math.abs(Y(a) - Y(b)), 1.5)}" rx="2" fill="var(${col})"/>`;
+    s += `<text class="tick" x="${x + w / 2}" y="${Math.min(Y(a), Y(b)) - 5}" text-anchor="middle">${k === "total" ? "" : v > 0 ? "+" : ""}${fr(v, 2)}</text>`;
+    const mots = nom.split(" ");
+    s += `<text x="${x + w / 2}" y="${H - m.b + 16}" text-anchor="middle">${esc(mots.slice(0, 2).join(" "))}</text>${mots.length > 2 ? `<text x="${x + w / 2}" y="${H - m.b + 30}" text-anchor="middle">${esc(mots.slice(2).join(" "))}</text>` : ""}`;
+  });
+  s += `</svg>`;
+  const h = host("ch-wf"); h.innerHTML = s;
+  h.querySelectorAll(".bar").forEach((b) => { b.addEventListener("pointermove", (ev) => { const r = h.getBoundingClientRect(), e = etapes[+b.dataset.i]; tip(h, ev.clientX - r.left, ev.clientY - r.top, `${esc(e[0])} : ${sg(e[1], 2)} MW/K`); }); b.addEventListener("pointerleave", () => untip(h)); });
+  $("cap-wf").textContent = `L'estimation à la main (Clapeyron + crédit, ${fr(d.a_la_main, 2)} MW/K) retrouve le modèle sans pertes d'échappement (${fr(d.modele_sans_pertes, 2)}) à ${fr(100 * Math.abs(d.residu_autres_effets / d.modele_sans_pertes), 1)} % près. Près du design, les pertes d'échappement diminuent quand l'eau se réchauffe (la vapeur sort moins vite), ce qui ajoute ${sg(d.effet_pertes_echappement, 1)} MW/K. Sur toute la plage 15-35 °C, la pente moyenne est de ${fr(pente, 1)} MWe/°C.`;
+})();
+
+(function tmoy() {
+  const a = TH.T_moyennes.n4, b = TH.T_moyennes.simple;
+  $("txt-tm").innerHTML = `Dans le cycle simple, l'eau entre dans le GV à 30 °C : une grande partie de la chaleur est reçue à basse température, et T̄ ne vaut que <span class="num">${fr(b.T_moyenne_apport_C)} °C</span>. Avec les six réchauffeurs, l'eau arrive à 231 °C et T̄ monte à <span class="num">${fr(a.T_moyenne_apport_C)} °C</span>. Le rendement endoréversible passe ainsi de ${fr(100 * b.rendement_endoreversible, 1)} % à ${fr(100 * a.rendement_endoreversible, 1)} %. En revanche, la fraction de ce rendement idéal effectivement atteinte reste la même (${fr(100 * b.efficacite_relative)} % et ${fr(100 * a.efficacite_relative)} %). <b>Tout le gain du réchauffage vient de la température moyenne d'apport de chaleur, pas de machines plus efficaces.</b>`;
+  const rows = [];
+  for (const [nom, x, c] of [["N4", a, "--s1"], ["Simple", b, "--s3"]]) {
+    rows.push({ n: `${nom} · Carnot (vapeur vive)`, v: 100 * x.rendement_carnot_vapeur, c: "--dome" });
+    rows.push({ n: `${nom} · endoréversible (T̄)`, v: 100 * x.rendement_endoreversible, c: c });
+    rows.push({ n: `${nom} · réel (modèle)`, v: 100 * x.rendement_cycle, c: c, bold: true });
+  }
+  barH("ch-tm", rows.map((r) => ({ ...r, lab: `${fr(r.v, 1)} %`, tip: `${r.n} : ${fr(r.v, 2)} %` })), { aria: "Rendements comparés", ml: 210 });
+})();
+
+(function tq() {
+  const g = TH.TQ_gv, c = TH.TQ_condenseur;
+  $("t-tq-gv").textContent = `Générateur de vapeur : pincement de ${fr(g.pincement_K, 1)} K au début de l'ébullition`;
+  $("t-tq-cond").textContent = `Condenseur : pincement de ${fr(c.pincement_K, 1)} K à la sortie de l'eau`;
+  const annot = (q, T1, T2) => (X, Y) => `<line x1="${X(q)}" x2="${X(q)}" y1="${Y(T1)}" y2="${Y(T2)}" stroke="var(--fg)" stroke-width="1.5"/><text class="lbl" x="${X(q) + 6}" y="${(Y(T1) + Y(T2)) / 2 + 4}">${fr(T1 - T2, 1)} K</text>`;
+  const ig = g.Q_MW.reduce((b, q, i) => (Math.abs(q - g.Q_pincement_MW) < Math.abs(g.Q_MW[b] - g.Q_pincement_MW) ? i : b), 0);
+  lineChart("ch-tq-gv", { aria: "Diagramme T-Q du générateur de vapeur", x: g.Q_MW, w: 460, h: 270, unit: "°C", td: 1, xlabel: "Puissance échangée cumulée (MW)", xfmt: (q) => `${fr(q)} MW`,
+    series: [{ n: "primaire", y: g.T_primaire, c: "--s2" }, { n: "secondaire", y: g.T_secondaire, c: "--s1" }], annot: annot(g.Q_MW[ig], g.T_primaire[ig], g.T_secondaire[ig]) });
+  const ic = c.Q_MW.length - 1;
+  lineChart("ch-tq-cond", { aria: "Diagramme T-Q du condenseur", x: c.Q_MW, w: 460, h: 270, unit: "°C", td: 1, xlabel: "Puissance échangée cumulée (MW)", xfmt: (q) => `${fr(q)} MW`, ymin: 10,
+    series: [{ n: "vapeur", y: c.T_vapeur, c: "--s2" }, { n: "eau de refroidissement", y: c.T_eau, c: "--s3" }], annot: annot(c.Q_MW[ic] * 0.97, c.T_vapeur[ic], c.T_eau[ic]) });
+  $("dtc").textContent = `${fr(TH.dTc_dTeau, 3)} K par K d'eau`;
+})();
+
+(function mollier() {
+  const M = TH.mollier, W = 900, H = 520, m = { l: 58, r: 70, t: 12, b: 44 }, s0 = 5.5, s1 = 7.9, h0 = 1850, h1 = 2950;
+  const X = (v) => m.l + (v - s0) / (s1 - s0) * (W - m.l - m.r), Y = (v) => H - m.b - (v - h0) / (h1 - h0) * (H - m.t - m.b);
+  const ok = (s, h) => s != null && h != null && s >= s0 - 0.05 && s <= s1 + 0.05 && h >= h0 - 20 && h <= h1 + 20;
+  const line = (S, Hh) => { let d = "", up = false; S.forEach((s, i) => { const h = Hh[i]; if (ok(s, h)) { d += `${up ? "L" : "M"}${X(s).toFixed(1)},${Y(h).toFixed(1)}`; up = true; } else up = false; }); return d; };
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramme de Mollier des détentes"><defs><clipPath id="cl-hs"><rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}"/></clipPath></defs>`;
+  for (const t of niceTicks(h0, h1, 6)) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--grid)"/><text class="tick" x="${m.l - 8}" y="${Y(t) + 3.5}" text-anchor="end">${fr(t)}</text>`;
+  for (const t of niceTicks(s0, s1, 6)) s += `<text class="tick" x="${X(t)}" y="${H - m.b + 17}" text-anchor="middle">${fr(t, 1)}</text>`;
+  s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 4}" text-anchor="middle">Entropie massique s (kJ/kg/K)</text><text x="14" y="${m.t + 4}" transform="rotate(-90 14 ${m.t + 4})" text-anchor="end">Enthalpie h (kJ/kg)</text>`;
+  s += `<g clip-path="url(#cl-hs)">`;
+  for (const [p, iso] of Object.entries(M.isobares)) {
+    s += `<path d="${line(iso.s, iso.h)}" fill="none" stroke="var(--dome)" stroke-width="0.9" stroke-dasharray="2 3"/>`;
+    let k = iso.s.length - 1; while (k > 0 && !ok(iso.s[k], iso.h[k])) k--;
+    if (k > 0) s += `<text class="tick" x="${Math.min(X(iso.s[k]) + 4, W - m.r + 4)}" y="${Y(iso.h[k]) + 3}">${fr(+p, +p < 1 ? 2 : 0)} bar</text>`;
+  }
+  s += `<path d="${line(M.saturation.s, M.saturation.h)}" fill="none" stroke="var(--fg-3)" stroke-width="1.6"/><text x="${X(6.0)}" y="${Y(2780) - 8}" class="tick">vapeur saturée (x = 1)</text>`;
+  const pts = [];
+  for (const [n, t] of Object.entries(M.troncons)) {
+    const col = n.startsWith("HP") ? "--s1" : n.startsWith("BP") ? "--s3" : "--s2";
+    if (t.s_iso) s += `<line x1="${X(t.s_iso[0])}" x2="${X(t.s_iso[1])}" y1="${Y(t.h_iso[0])}" y2="${Y(t.h_iso[1])}" stroke="var(--fg-3)" stroke-dasharray="4 3"/>`;
+    s += `<path class="seg-hs" data-n="${n}" d="${line(t.s, t.h)}" fill="none" stroke="var(${col})" stroke-width="3.2" stroke-linecap="round"/>`;
+    const k = Math.floor(t.s.length / 2); pts.push([n, t, t.s[k], t.h[k]]);
+    if (t.eta) s += `<text class="lbl" x="${X(t.s[0]) + 6}" y="${Y(t.h[0]) + 12}">${n}</text>`;
+  }
+  s += `</g><rect class="hit" x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent"/></svg>`;
+  const h = host("ch-hs"); h.innerHTML = s;
+  const svg = h.querySelector("svg");
+  svg.querySelector(".hit").addEventListener("pointermove", (ev) => {
+    const r = svg.getBoundingClientRect(), k = W / r.width, px = (ev.clientX - r.left) * k, py = (ev.clientY - r.top) * k;
+    let best = null, bd = 30;
+    for (const [n, t] of pts) t.s.forEach((sv, i) => { const dd = Math.hypot(X(sv) - px, Y(t.h[i]) - py); if (dd < bd) { bd = dd; best = [n, t, sv, t.h[i]]; } });
+    if (!best) { untip(h); return; }
+    const [n, t] = best;
+    tip(h, X(best[2]) / k, Y(best[3]) / k, t.eta ? `<b>${n}</b> · ${fr(t.p_in_bar, 2)} → ${fr(t.p_out_bar, 2)} bar<br>η effectif ${fr(t.eta, 3)} · Δh ${fr(t.h[0] - t.h.at(-1))} kJ/kg` : `<b>${n}</b>`);
+  });
+  svg.querySelector(".hit").addEventListener("pointerleave", () => untip(h));
+})();
+
+(function odg() {
+  const c = TH.decomposition.details_clapeyron, a = TH.T_moyennes.n4, b = TH.T_moyennes.simple;
+  $("tab-odg").innerHTML = `<thead><tr><th>grandeur</th><th>valeur</th><th>pourquoi c'est utile</th></tr></thead><tbody>` + [
+    ["Pente de la courbe de saturation à 29 °C", `${fr(c.coolprop_dp_dT_Pa_K / 100, 2)} mbar/K`, "+1 K au condenseur ≈ +2,3 mbar de contre-pression"],
+    ["Chaleur latente à 29 °C", `${fr(c.h_fg_kJ_kg)} kJ/kg`, "l'essentiel de la chaleur rejetée"],
+    ["Chaleur cédée par la vapeur d'échappement", `${fr(c.Q_latent_MW)} MW`, "pèse dans dW/dT_c = −η Q/T_c"],
+    ["Sensibilité au condenseur (modèle)", `${fr(pente, 1)} MWe/°C`, `${fr(-100 * pente / Dz.puissance_electrique_nette_MW, 2)} % par degré d'eau`],
+    ["T̄ d'apport de chaleur, N4 / simple", `${fr(a.T_moyenne_apport_C)} / ${fr(b.T_moyenne_apport_C)} °C`, "explique le gain du réchauffage"],
+    ["Rendement endoréversible, N4 / simple", `${fr(100 * a.rendement_endoreversible, 1)} / ${fr(100 * b.rendement_endoreversible, 1)} %`, "plafond réaliste du cycle"],
+    ["Pincement du GV", `${fr(TH.TQ_gv.pincement_K, 1)} K`, "au début de l'ébullition"],
+    ["Rendement exergétique du secondaire", `${fr(100 * Ex.rendement_exergetique, 1)} %`, "qualité de conversion de la chaleur primaire"],
+  ].map((r) => `<tr><td class="txt">${r[0]}</td><td>${r[1]}</td><td class="txt" style="color:var(--fg-2);white-space:normal">${r[2]}</td></tr>`).join("") + `</tbody>`;
+})();
+
+/* ================= ONGLET CODE ================= */
+(function code() {
+  const NOTES = {
+    "src/rep_secondaire/cycle_n4.py": ["Le cycle N4 complet", "Le cœur du projet : le réseau TESPy, le design puis l'offdesign. À lire en priorité : _declarer_offdesign (ce qui reste imposé et ce qui devient libre) et _point_fixe (le couplage avec les modèles hors TESPy)."],
+    "src/rep_secondaire/analyse_thermo.py": ["Les démonstrations à la main", "Clapeyron, crédit régénératif, températures moyennes entropiques, diagrammes T-Q et Mollier, codés pour être testés contre le modèle."],
+    "src/rep_secondaire/echappement.py": ["Pertes d'échappement BP", "Méthode Spencer-Cotton-Cannon et blocage sonique : la pression de blocage est cherchée par dichotomie."],
+    "src/rep_secondaire/tour.py": ["Tour à tirage naturel", "Intégrale de Merkel par Tchebychev. Le tirage naturel est résolu comme une équation d'équilibre."],
+    "src/rep_secondaire/exergie.py": ["Bilan d'exergie", "Gouy-Stodola composant par composant, avec un bilan qui doit se fermer."],
+    "src/rep_secondaire/condenseur.py": ["Échange au condenseur", "Correction de UA avec la température de l'eau (Dittus-Boelter côté tubes)."],
+    "src/rep_secondaire/annuel.py": ["Production annuelle", "Chaîne air → tour → centrale sur 87 672 heures, par interpolation d'une table précalculée."],
+    "src/rep_secondaire/incertitudes.py": ["Incertitudes", "Hypercube latin et analyse en tornade, calcul parallèle."],
+    "tests/test_analyse_thermo.py": ["Tests : thermo à la main", "Le modèle doit retrouver Clapeyron, le crédit régénératif et les températures moyennes."],
+    "tests/test_cycle_n4.py": ["Tests : cycle N4", "Bilans, second principe composant par composant, tour, rejets."],
+    "tests/test_verification_independante.py": ["Tests : vérification indépendante", "Le cycle simple recalculé sans TESPy doit coïncider à 10⁻⁵."],
+  };
+  const files = Object.keys(D.sources || {});
+  if (!files.length) { $("tab-code").querySelector(".code-wrap").hidden = true; return; }
+  const total = files.reduce((n, f) => n + D.sources[f].split("\n").length, 0);
+  $("code-titre").textContent = `Le code : ${fr(total)} lignes de Python pour la physique et ses tests`;
+  const nav = $("files");
+  let html = "", grp = "";
+  for (const f of files) {
+    const g = f.startsWith("tests/") ? "Tests" : "Modèles physiques";
+    if (g !== grp) { html += `<span class="grp">${g}</span>`; grp = g; }
+    html += `<button aria-pressed="false" data-f="${esc(f)}"><b>${esc(f.split("/").pop())}</b><span>${esc((NOTES[f] || [""])[0])}</span></button>`;
+  }
+  nav.innerHTML = html;
+  const montrer = (f) => {
+    const src = D.sources[f], n = src.split("\n").length;
+    $("v-path").textContent = f; $("v-note").textContent = (NOTES[f] || ["", ""])[1]; $("v-lines").textContent = `${n} lignes`;
+    let corps;
+    try { corps = window.hljs ? hljs.highlight(src, { language: "python" }).value : esc(src); } catch (e) { corps = esc(src); }
+    $("v-code").innerHTML = `<pre class="gut">${Array.from({ length: n }, (_, i) => i + 1).join("\n")}</pre><pre class="src"><code>${corps}</code></pre>`;
+    $("v-code").scrollTop = 0;
+    nav.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.f === f));
+  };
+  nav.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => montrer(b.dataset.f)));
+  montrer(files[0]);
+})();
+
+/* ================= ONGLET DÉMARCHE ================= */
+(function demarche() {
+  const d = TH.decomposition;
+  const etapes = [
+    ["Un cycle de Rankine pour commencer", "Rendement de 32,6 %, mais 27 % d'humidité en sortie de turbine : aucune vraie turbine ne le supporterait.", "Garder ce cycle comme référence, en notant explicitement sa limite.", "Une base de comparaison pour chaque étape suivante."],
+    ["Figer l'installation", "En mode dimensionnement, chaque température d'eau redimensionnait un nouveau condenseur, ce qui ne répond pas à la question posée.", "Passer en hors-dimensionnement : UA du condenseur et débit d'eau figés.", "−5,3 MWe/°C, sur une droite parfaite."],
+    ["Une droite trop belle", "Le gain continuait jusqu'à 0 °C, alors qu'une turbine réelle finit par saturer en sortie.", "Modéliser les pertes d'échappement (Spencer-Cotton-Cannon) et le blocage sonique.", "Un optimum apparaît : refroidir davantage ne sert plus à rien."],
+    ["Un bug trouvé par recoupement", "Le cas « sans pertes » donnait 1 367 MWe à 15 °C au lieu de 1 370. Le balayage modifiait les paramètres reçus : le second calcul était dimensionné à 0 °C.", "Copie défensive des paramètres et test de non-régression.", "Les résultats publiés avant n'étaient pas touchés, et l'erreur ne peut plus revenir."],
+    ["Le condenseur ignorait la température de l'eau", "UA constant, alors que l'eau froide, plus visqueuse, échange moins bien.", "Correction de UA par Dittus-Boelter, puis vérification du point de design sans TESPy, avec CoolProp seul.", "Écart inférieur à 10⁻⁵ entre les deux calculs."],
+    ["Passer au vrai N4", "Premier résultat : 1 646 MWe bruts, soit 5,5 % de plus que la valeur publiée.", "Plutôt que de baisser les rendements à la main, ajouter la physique manquante : pertes dues à l'humidité (Baumann) et pertes de charge.", "+1,9 % sans calage, eau alimentaire à 231 °C."],
+    ["Un système surdéterminé qui avait raison", "En hors-dimensionnement, le solveur signalait une équation de trop.", "Comprendre que la pression vapeur était imposée deux fois, par le GV et par la loi du cône de la HP. Laisser libres les soupapes de réglage, comme sur une vraie tranche.", "La pression GV calculée reste à 72 bar, ce qui valide l'hypothèse des premières étapes."],
+    ["L'exergie contredit l'intuition", "On s'attendait à ce que le GV soit le premier poste de destruction d'exergie.", "Bilan de Gouy-Stodola composant par composant, fermé à la précision machine.", "C'est la turbine BP (134 MW, à cause de l'humidité). Le condenseur, énorme en énergie, détruit peu d'exergie."],
+    ["La tour qui s'étouffe", "En air chaud et sec, le calcul itératif du tirage divergeait.", "Identifier la cause physique : à débit d'air nominal, l'air sortant serait plus dense que l'air ambiant. Résoudre directement l'équilibre (L/G)²·Δρ = constante.", "Le débit d'air chute de moitié à 40 °C : c'est le comportement connu des tours à tirage naturel."],
+    ["Démontrer à la main", `Clapeyron prévoyait ${fr(d.clapeyron, 1)} MW/K, le modèle donnait ${fr(d.modele_complet, 1)} près du design.`, "Chercher les effets oubliés : le crédit de régénération (moins de soutirage) et la baisse des pertes d'échappement.", `L'estimation à la main retrouve le modèle à ${fr(100 * Math.abs(d.residu_autres_effets / d.modele_sans_pertes), 1)} % près.`],
+  ];
+  $("timeline").innerHTML = etapes.map(([t, c, dd, r]) => `<li><h4>${esc(t)}</h4><div class="q"><b>Constat</b><span>${esc(c)}</span><b>Choix</b><span>${esc(dd)}</span><b>Résultat</b><span>${esc(r)}</span></div></li>`).join("");
+  $("retiens").innerHTML = [
+    ["Un résultat trop propre est suspect.", "La droite parfaite cachait la limite physique de la turbine BP."],
+    ["Recouper par une méthode indépendante.", "Le calcul à la main et le recalcul sans TESPy ont trouvé ce que les tests unitaires ne voyaient pas."],
+    ["Ajouter de la physique plutôt que caler.", "Un coefficient ajusté masque l'écart. Un mécanisme modélisé l'explique."],
+    ["Le second principe localise les pertes.", "Le premier principe montre où va l'énergie. Le second montre où se perd sa valeur."],
+    ["Quantifier l'incertitude change la conclusion.", "La sensibilité est robuste. La position de l'optimum ne l'est pas, et il faut le dire."],
+  ].map(([a, b]) => `<li><b>${a}</b><span>${b}</span></li>`).join("");
+})();
+
+/* ================= NAVIGATION PAR ONGLETS ================= */
+(function router() {
+  const TABS = ["etude", "thermo", "code", "demarche"];
+  const liens = [...document.querySelectorAll(".tabs a")];
+  function afficher(nom, cible) {
+    TABS.forEach((t) => { $(`tab-${t}`).hidden = t !== nom; });
+    liens.forEach((a) => { if (a.dataset.tab === nom) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    if (cible) requestAnimationFrame(() => cible.scrollIntoView({ block: "start" }));
+    else window.scrollTo(0, 0);
+  }
+  function route(h) {
+    h = h ?? decodeURIComponent(location.hash.slice(1));
+    if (TABS.includes(h)) return afficher(h);
+    const el = h && document.getElementById(h);
+    if (el) { const t = el.closest(".tab"); return afficher(t ? t.id.replace("tab-", "") : "etude", el); }
+    afficher("etude");
+  }
+  window.addEventListener("hashchange", () => route());
+  // Les liens internes routent aussi directement (l'événement hashchange
+  // n'est pas garanti dans tous les cadres d'affichage).
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const h = a.getAttribute("href").slice(1);
+    if (!h) return;
+    e.preventDefault();
+    try { history.replaceState(null, "", `#${h}`); } catch (err) {}
+    route(h);
+  });
+  route();
+})();
+
 </script>

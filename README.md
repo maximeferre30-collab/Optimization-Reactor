@@ -1,5 +1,7 @@
 # Circuit secondaire d'un REP N4 avec TESPy
 
+*Projet personnel de Maxime, élève ingénieur à l'IMT.*
+
 Ce projet modélise le circuit eau-vapeur d'une tranche du palier N4 (Chooz B,
 Civaux : 4 270 MWth). Il étudie l'effet de la **température de la source
 froide** sur la puissance électrique, depuis un cycle de Rankine d'école
@@ -15,6 +17,7 @@ jusqu'à une étude sur dix ans de météo réelle.
 | 6 | **Tour aéroréfrigérante** à tirage naturel (Merkel) et **production horaire sur météo réelle** 2015-2024 (Chooz, Civaux), scénario climat +2 °C |
 | 7 | **Limites réglementaires de rejet** (variante circuit ouvert) |
 | 8 | **Incertitudes** : Monte-Carlo par hypercube latin et analyse en tornade |
+| 9 | **Thermodynamique à la main** : sensibilité par Clapeyron et crédit de régénération, températures moyennes entropiques, diagrammes T-Q et Mollier, chacun confronté au modèle |
 
 ## Installation
 
@@ -34,7 +37,10 @@ python scripts/figures_rapport.py     # toutes les études et figures, ~8 min
 python scripts/rapport_html.py        # rapport interactif
 ```
 
-Ouvrir ensuite **`results/rapport.html`** dans un navigateur. Le rapport contient :
+Ouvrir ensuite **`results/rapport.html`** dans un navigateur. Le rapport a quatre onglets :
+**Étude** (résultats interactifs), **Thermodynamique** (démonstrations à la main),
+**Code** (sources commentées) et **Démarche** (carnet de bord des choix et corrections).
+L'onglet Étude contient :
 - un curseur de température d'eau, qui met à jour les valeurs et déplace un repère sur les graphiques ;
 - le schéma du circuit, le diagramme T-s, le Sankey et le bilan d'exergie ;
 - la carte jour par jour sur dix ans ;
@@ -58,7 +64,7 @@ Figures PNG (200 dpi) dans `results/` :
 | `fig9_incertitudes.png` | Bande d'incertitude et tornade |
 
 ```bash
-pytest     # 26 vérifications automatiques
+pytest     # 30 vérifications automatiques
 ```
 
 ## Arborescence
@@ -132,6 +138,29 @@ aux garnitures, purges des GV, vapeur auxiliaire, pertes de charge des soutirage
 
 ![Puissance](results/fig3_puissance_n4.png)
 ![T-s](results/fig1_cycle_n4_Ts.png)
+
+### Thermodynamique à la main
+
+Chaque résultat important est redémontré sans le modèle, puis confronté au calcul
+numérique (`analyse_thermo.py`, `tests/test_analyse_thermo.py`).
+
+**Sensibilité au condenseur.** La relation de Gibbs à entropie constante (dh = v dp)
+et la relation de Clapeyron donnent :
+
+    dW/dT_c ≈ −η · ṁ · x · h_fg / T_c = −η · Q_lat / T_c ≈ −6,9 MW/K
+
+Le cycle à soutirages ajoute un crédit de régénération (+0,7 MW/K) : un condensat plus
+chaud demande moins de soutirage au réchauffeur RBP1. On obtient −6,16 MW/K à la main,
+contre −6,05 MW/K pour le modèle sans pertes d'échappement, soit 1,8 % d'écart. Près du
+design, la baisse des pertes d'échappement ajoute encore +1,1 MW/K.
+
+**Gain du réchauffage.** La température moyenne entropique d'apport de chaleur,
+T̄ = Δh/Δs, passe de 218 °C (cycle simple) à 283 °C (N4). Le rendement endoréversible
+passe donc de 38,5 % à 45,7 %. La fraction de ce rendement idéal atteinte reste
+d'environ 82 % dans les deux cas : tout le gain vient de T̄.
+
+**Pincements.** Le pincement vaut 7,6 K dans le GV, au début de l'ébullition, et 4 K au
+condenseur. La température de condensation suit l'eau de refroidissement à 1,007 K/K.
 
 ### Exergie
 
@@ -211,6 +240,13 @@ Une analyse en tornade complète l'étude : chaque hypothèse est mise à ses bo
   - point de conception retrouvé ;
   - eau jamais sous la température humide.
 - **Rejets :** comportements limites vérifiés (grand fleuve, rivière déjà trop chaude).
+
+## Transparence
+
+Un assistant d'IA a servi d'aide à la programmation. Les choix de modélisation, les
+vérifications et l'interprétation sont détaillés dans l'onglet Démarche du rapport, et
+chacun est couvert par un test. `docs/preparation_entretien.md` rassemble les questions
+techniques à maîtriser pour présenter le projet.
 
 ## Limites
 
