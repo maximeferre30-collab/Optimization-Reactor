@@ -108,7 +108,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .explore { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 20px; align-items: end; }
 @media (max-width: 640px) { .explore { grid-template-columns: minmax(0, 1fr); } }
 .chart { position: relative; min-width: 0; }
-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 svg text { fill: var(--fg-2); font: 11px var(--f-body); }
 svg .tick { fill: var(--fg-3); font: 10.5px var(--f-mono); }
 svg .lbl { fill: var(--fg); font-weight: 600; }
@@ -179,7 +179,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .deriv { display: grid; gap: 12px; align-content: start; min-width: 0; }
 .deriv p { color: var(--fg-2); font-size: 0.95rem; }
 .deriv p b { color: var(--fg); }
-math[display="block"] { display: block; overflow-x: auto; overflow-y: hidden; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 1.12rem; color: var(--fg); }
+
 /* --- Code --- */
 .cmds { display: flex; flex-wrap: wrap; gap: 8px; }
 .cmds code { font: 0.85rem var(--f-mono); background: var(--surface); border: 1px solid var(--line); padding: 5px 10px; border-radius: 6px; }
@@ -301,7 +301,7 @@ td.txt { font-family: var(--f-body); }
 details { border-radius: 0; border-width: 1px 0 0; background: none; }
 details > summary { padding: 14px 0; font-weight: 600; font-size: 1.02rem; }
 details > .body { padding: 0 0 18px; }
-.formule, math[display="block"] { background: none; border-left: 2px solid var(--line); border-radius: 0; }
+.formule { background: none; border-left: 2px solid var(--line); border-radius: 0; }
 .toc .grp { font: 600 0.8rem var(--f-display); text-transform: none; letter-spacing: 0; color: var(--fg); }
 .toc a { font-family: var(--f-display); }
 .tip { border-radius: var(--r); font-family: var(--f-mono); }
@@ -319,244 +319,359 @@ footer { font-family: var(--f-display); }
 .timeline li::after { display: none; }
 .timeline .q b { font-family: var(--f-display); text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
 
+/* ===== Structure de rapport ===== */
+.soustitre { font: 1.08rem/1.5 var(--f-display); color: var(--fg-2); margin: -6px 0 0; max-width: 70ch; }
+.motscles { font: 0.9rem/1.5 var(--f-display); color: var(--fg-2); margin: 0; }
+.motscles b { color: var(--fg); font-weight: 600; }
+main.report { display: grid; gap: 52px; min-width: 0; counter-reset: chap; }
+.chap { display: grid; gap: 30px; counter-increment: chap; counter-reset: sec; scroll-margin-top: 80px; }
+.chap > h2, .annexe > h2 { font: 600 1.6rem/1.2 var(--f-display); padding-bottom: 10px; border-bottom: 1px solid var(--fg); }
+.chap > h2::before { content: counter(chap) ". "; color: var(--accent); }
+.sec { display: grid; gap: 14px; counter-increment: sec; scroll-margin-top: 80px; min-width: 0; }
+.sec > h3 { font: 600 1.2rem/1.3 var(--f-display); }
+.sec > h3::before { content: counter(chap) "." counter(sec) "  "; color: var(--fg-3); font-weight: 500; }
+.sec > p, .annexe > p { max-width: 74ch; }
+.annexe { display: grid; gap: 18px; scroll-margin-top: 80px; min-width: 0; }
+h4.small { margin: 0; font: 600 0.95rem var(--f-display); }
+figure.fig { margin: 6px 0 0; display: grid; gap: 10px; min-width: 0; }
+figure.fig > figcaption { font: 0.88rem/1.5 var(--f-display); color: var(--fg-2); border-top: 1px solid var(--line); padding-top: 8px; }
+figure.fig > figcaption b { color: var(--fg); font-weight: 600; }
+.figtools { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+table.numtab caption { caption-side: top; text-align: left; font: 0.88rem/1.5 var(--f-display); color: var(--fg-2); padding: 8px 0; }
+table.numtab caption b { color: var(--fg); font-weight: 600; }
+.tablewrap { border-top: 0; }
+.eq { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.eq { padding: 6px 0 6px 16px; border-left: 2px solid var(--line); }
+.eq .tex { flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; color: var(--fg); font-size: 1.08rem; padding: 2px 0; }
+.eq mjx-container[display="true"] { margin: 0.4em 0 !important; text-align: left !important; }
+.eq mjx-container svg { max-width: none; }
+.eqn { font: 500 0.95rem var(--f-mono); color: var(--fg-3); flex: 0 0 auto; }
+ol.obj { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; max-width: 76ch; }
+ol.obj li::marker { font-family: var(--f-mono); color: var(--accent); }
+ol.refs { list-style: none; margin: 0; padding: 0; counter-reset: r; display: grid; gap: 8px; font-size: 0.95rem; max-width: 90ch; }
+ol.refs li { counter-increment: r; padding-left: 2.6em; text-indent: -2.6em; }
+ol.refs li::before { content: "[" counter(r) "]"; display: inline-block; width: 2.6em; text-indent: 0; font-family: var(--f-mono); color: var(--accent); }
+ol.refs li:target { background: var(--accent-soft); }
+a.cite, a.ref { color: var(--accent); text-decoration: none; }
+a.cite:hover, a.ref:hover { text-decoration: underline; }
+a.cite { font-family: var(--f-mono); font-size: 0.9em; }
+.nomen td:first-child { font-family: var(--f-body); white-space: nowrap; }
+.callout { margin: 0; max-width: 74ch; }
+#cap-wf, #cap-rej { color: var(--fg-2); font-size: 0.95rem; max-width: 74ch; }
+.report code { font: 0.85rem var(--f-mono); background: var(--surface-2); padding: 1px 5px; border-radius: 2px; }
+
 </style>
 
 <div class="topbar"><div class="topbar-in">
-  <a class="me" href="#etude"><span><b>Maxime</b> <small>· élève ingénieur, IMT</small></span></a>
-  <nav class="tabs" aria-label="Onglets"><a href="#etude" data-tab="etude">Étude</a><a href="#thermo" data-tab="thermo">Thermodynamique</a><a href="#code" data-tab="code">Code</a><a href="#demarche" data-tab="demarche">Démarche</a></nav>
+  <a class="me" href="#garde"><span><b>Maxime</b> <small>· élève ingénieur, IMT</small></span></a>
+  <nav class="tabs" aria-label="Accès rapide"><a href="#ch-resultats">Résultats</a><a href="#ch-analyse">Analyse</a><a href="#ch-conclusions">Conclusions</a><a href="#annexe-code">Code</a></nav>
   <a class="gh" href="https://github.com/maximeferre30-collab/Optimization-Reactor">Code sur GitHub</a>
 </div></div>
 
-<div class="tab" id="tab-etude">
-<header class="hero">
+<header class="hero" id="garde">
   <div class="hero-in">
-    <p class="docmeta">Note d'étude · Maxime, élève ingénieur IMT · novembre 2026</p>
+    <p class="docmeta">Rapport d'étude · Maxime, élève ingénieur IMT · novembre 2026 · version 5</p>
     <h1>Sensibilité d'une tranche REP N4 à la température de sa source froide</h1>
+    <p class="soustitre">Modélisation du circuit secondaire, validation, analyse thermodynamique et application à dix ans de météo réelle</p>
     <h2 class="resume">Résumé</h2>
     <p class="answer" id="answer"></p>
     <div class="hero-kpis" id="hero-kpis"></div>
-    <p class="hero-cta">Aller à : <a href="#explorer">résultat interactif</a> · <a href="#schema-card">schéma du circuit</a> · <a href="#clapeyron">démonstration à la main</a> · <a href="#meteo-calc">calculateur météo</a></p>
+    <p class="motscles"><b>Mots-clés :</b> REP, palier N4, cycle de Rankine à soutirages, condenseur, source froide, pertes d'échappement, exergie, tour aéroréfrigérante, TESPy.</p>
   </div>
 </header>
 
 <div class="shell">
   <nav class="toc" aria-label="Sommaire">
-    <span class="grp">1 · Résultat</span><a href="#explorer">Explorer la température</a>
-    <span class="grp">2 · Le modèle</span><a href="#schema-card">Schéma du circuit</a><a href="#ts-card">Diagramme T-s</a><a href="#bilan-card">Énergie et exergie</a>
-    <span class="grp">3 · Monde réel</span><a href="#meteo-calc">Calculateur météo</a><a href="#annee-card">Une année de production</a><a href="#rejets-card">Limites de rejet</a>
-    <span class="grp">4 · Fiabilité</span><a href="#valid-card">Validation</a><a href="#inc-card">Incertitudes</a><a href="#annexes">Méthode et hypothèses</a>
+    <span class="grp">Sommaire</span>
+    <a href="#nomenclature">Nomenclature</a>
+    <a href="#ch-intro">1. Introduction</a>
+    <a href="#ch-installation">2. Installation étudiée</a>
+    <a href="#ch-modelisation">3. Modélisation</a>
+    <a href="#ch-vv">4. Vérification et validation</a>
+    <a href="#ch-resultats">5. Résultats</a>
+    <a href="#ch-analyse">6. Analyse et discussion</a>
+    <a href="#ch-conclusions">7. Conclusions</a>
+    <a href="#references">Références</a>
+    <span class="grp">Annexes</span>
+    <a href="#annexe-etats">A. États thermodynamiques</a>
+    <a href="#annexe-code">B. Code source</a>
+    <a href="#annexe-journal">C. Journal de développement</a>
   </nav>
 
-  <main>
-    <section class="part" aria-labelledby="p1">
-      <div class="part-head"><h2 id="p1">Le résultat</h2><p>Même installation, même puissance du réacteur : seule la température de l'eau qui entre au condenseur change. Déplacez le curseur, ou cliquez sur la courbe.</p></div>
-      <article class="card" id="explorer">
-        <div class="explore">
-          <div class="slider"><label for="teau">Température de l'eau au condenseur <output id="tval">15 °C</output></label><input type="range" id="teau" min="0" max="35" step="1" value="15"></div>
-          <span class="chip" id="chip" hidden>ÉCHAPPEMENT BLOQUÉ</span>
-        </div>
-        <div class="tiles" id="tiles"></div>
-        <div class="card-head"><div><h3 id="titre-p"></h3></div><div class="legend" id="leg-p"></div></div>
-        <div class="chart" id="ch-p"></div>
-        <p class="cap">Zone grisée : écoulement bloqué en sortie de turbine BP. Cliquez sur la légende pour afficher ou masquer une courbe.</p>
-        <div class="grid2">
-          <div class="stack"><h3 class="small">Pression au condenseur (mbar)</h3><div class="chart" id="ch-pc"></div></div>
-          <div class="stack"><h3 class="small">Perte d'échappement BP (MW)</h3><div class="chart" id="ch-ech"></div></div>
-        </div>
-        <div class="callout" id="lecture" aria-live="polite"></div>
-      </article>
-    </section>
-
-    <section class="part" aria-labelledby="p2">
-      <div class="part-head"><h2 id="p2">Le modèle</h2><p>Un cycle N4 complet : turbine HP, sécheur-surchauffeur, turbine BP, six étages de réchauffage, et le côté primaire du générateur de vapeur.</p></div>
-      <article class="card" id="schema-card">
-        <div class="card-head"><div><h3>Cliquez sur un composant pour l'inspecter</h3><p class="sub">Épaisseur des traits proportionnelle au débit. Orange : vapeur. Bleu : eau. Pointillés jaunes : soutirages. Vert : eau de refroidissement.</p></div>
-          <button class="btn plain" id="anim" aria-pressed="true">Mettre en pause</button></div>
-        <div class="schema-wrap"><div class="chart" id="schema"></div><aside class="info" id="info" aria-live="polite"></aside></div>
-      </article>
-      <article class="card" id="ts-card">
-        <div class="card-head"><div><h3>Le réchauffage et la resurchauffe changent la forme du cycle</h3><p class="sub">Diagramme T-s à 15 °C. L'eau entre dans le GV à 231 °C au lieu de 30 °C. La vapeur est séchée puis resurchauffée avant la turbine BP.</p></div><div class="legend" id="leg-ts"></div></div>
-        <div class="chart" id="ch-ts"></div>
-      </article>
-      <article class="card" id="bilan-card">
-        <div class="card-head"><div><h3 id="titre-bilan"></h3><p class="sub" id="sub-bilan"></p></div>
-          <div class="seg" role="group" aria-label="Type de bilan" id="seg-bilan"><button aria-pressed="true" data-v="energie">Énergie</button><button aria-pressed="false" data-v="exergie">Exergie</button></div></div>
-        <div class="chart" id="ch-bilan"></div>
-      </article>
-    </section>
-
-    <section class="part" aria-labelledby="p3">
-      <div class="part-head"><h2 id="p3">Dans le monde réel</h2><p>Le N4 est refroidi par des tours : la température de l'eau dépend de l'air, et surtout de son humidité. Chaîne de calcul : air → tour (Merkel, tirage naturel) → eau au condenseur → puissance.</p></div>
-      <article class="card" id="meteo-calc">
-        <div class="card-head"><div><h3>Calculateur : quelle puissance par ce temps-là&nbsp;?</h3><p class="sub">Réglez l'air extérieur ou cliquez sur la carte. La tour et la centrale sont couplées, avec les mêmes modèles que l'étude annuelle.</p></div>
-          <div class="seg" role="group" aria-label="Site" id="seg-site-calc"><button aria-pressed="true" data-v="chooz">Chooz</button><button aria-pressed="false" data-v="civaux">Civaux</button></div></div>
-        <div class="grid2">
-          <div class="slider"><label for="tair">Température de l'air <output id="tair-o"></output></label><input type="range" id="tair" min="-15" max="40" step="1" value="12"></div>
-          <div class="slider"><label for="hr">Humidité relative <output id="hr-o"></output></label><input type="range" id="hr" min="10" max="100" step="5" value="75"></div>
-        </div>
-        <div class="tiles" id="tiles-meteo"></div>
-        <div class="chart" id="ch-calc"></div>
-        <p class="cap">Carte : puissance nette selon l'air extérieur. Le cercle blanc marque la météo choisie. Plus l'air est humide, moins la tour refroidit : à même température, l'air humide coûte plus de puissance.</p>
-      </article>
-      <article class="card" id="annee-card">
-        <div class="card-head"><div><h3 id="titre-annee"></h3><p class="sub">Dix ans de météo horaire réelle (réanalyse ERA5, 2015-2024). Réacteur supposé à pleine puissance toute l'année.</p></div>
-          <div class="seg" role="group" aria-label="Site" id="seg-site"><button aria-pressed="true" data-v="chooz">Chooz</button><button aria-pressed="false" data-v="civaux">Civaux</button></div></div>
-        <div class="tiles" id="tiles-annee"></div>
-        <div class="legend" id="leg-mois"></div>
-        <div class="chart" id="ch-mois"></div>
-        <h3 class="small">Jour par jour</h3>
-        <div class="chart" id="carte"></div>
-        <p class="cap">Chaque case est la moyenne d'une journée, et les étés chauds y forment des bandes. Survolez une case pour la date et la valeur.</p>
-      </article>
-      <article class="card" id="rejets-card">
-        <div class="card-head"><div><h3>Et si la tranche était refroidie par la rivière&nbsp;?</h3><p class="sub">En circuit ouvert, les ≈ 2 600 MW de chaleur iraient dans la rivière, et l'arrêté de rejet imposerait des baisses de puissance. Réglez les limites : la carte se recalcule. Les valeurs sont illustratives, chaque site a les siennes.</p></div></div>
-        <div class="grid2">
-          <div class="slider"><label for="dtmax">Échauffement maximal de la rivière <output id="dtmax-o"></output></label><input type="range" id="dtmax" min="1" max="6" step="0.5" value="3"></div>
-          <div class="slider"><label for="tavmax">Température aval maximale <output id="tavmax-o"></output></label><input type="range" id="tavmax" min="22" max="32" step="0.5" value="28"></div>
-        </div>
-        <div class="chart" id="ch-rej"></div>
-        <p class="cap" id="cap-rej"></p>
-      </article>
-    </section>
-
-    <section class="part" aria-labelledby="p4">
-      <div class="part-head"><h2 id="p4">Ce que valent ces chiffres</h2><p>Le modèle est validé contre les données publiques et contrôlé par 30 tests automatiques. Ses hypothèses incertaines ont été propagées par Monte-Carlo.</p></div>
-      <article class="card" id="valid-card">
-        <div class="stack"><h3>Le modèle retrouve la tranche réelle à 2 % près, sans calage</h3><p class="sub">Les paramètres sont des valeurs d'ingénierie usuelles. L'écart restant vient de ce que le modèle ignore : fuites aux garnitures, purges des GV, vapeur auxiliaire.</p></div>
-        <div class="tablewrap"><table id="tab-valid"></table></div>
-      </article>
-      <article class="card" id="inc-card">
-        <div class="stack"><h3 id="titre-inc"></h3><p class="sub" id="sub-inc"></p></div>
-        <div class="grid2">
-          <div class="stack"><h3 class="small">Puissance nette, médiane et intervalle 5-95 %</h3><div class="chart" id="ch-inc"></div></div>
-          <div class="stack"><h3 class="small">Quelle hypothèse pèse le plus sur la pente&nbsp;?</h3><div class="legend"><span><i class="box" style="background:var(--s2)"></i>borne basse</span><span><i class="box" style="background:var(--s1)"></i>borne haute</span></div><div class="chart" id="ch-tor"></div></div>
-        </div>
-      </article>
-      <div id="annexes" class="stack" style="gap:12px;scroll-margin-top:20px">
-        <details><summary>Méthode : pertes d'échappement, humidité, condenseur, tour</summary><div class="body">
-          <div class="grid2"><div class="stack">
-            <p><b>Pertes d'échappement BP (Spencer-Cotton-Cannon).</b> Une partie de l'énergie disponible en fin de détente n'est pas convertie au dernier étage.</p>
-            <p class="formule">h_UEEP = h_ELEP + EL(V) · 0,87 · (1 − 0,01 Y) · (1 − 0,0065 Y)</p>
-            <p>V est la vitesse axiale de sortie, avec une section fixée pour 250 m/s au design. L'écoulement est bloqué au-delà de 400 m/s.</p>
-            <p><b>Humidité (règle de Baumann).</b></p><p class="formule">η = η_sec · (1 − a · y_moy), a = 1</p>
-            <p><b>Condenseur.</b> UA corrigé selon la température d'eau (Dittus-Boelter côté tubes). <b>Tour.</b> Intégrale de Merkel (Tchebychev 4 points, norme CTI) et tirage naturel (L/G)²·Δρ = constante.</p>
-          </div><div class="stack"><h3 class="small">Courbe EL(V) et point de fonctionnement</h3><div class="chart" id="ch-el"></div><p class="cap">Le point suit le curseur de la partie 1.</p></div></div>
-        </div></details>
-        <details><summary>Hypothèses</summary><div class="body"><ul class="items" id="hyp"></ul></div></details>
-        <details><summary>Vérifications automatiques et limites</summary><div class="body"><div class="grid2"><div class="stack"><h3 class="small">Vérifications (pytest)</h3><ul class="items" id="verif"></ul></div><div class="stack"><h3 class="small">Limites connues</h3><ul class="items" id="limites"></ul></div></div></div></details>
-        <details><summary>Tableau des états thermodynamiques</summary><div class="body"><div class="tablewrap"><table id="tab-etats"></table></div></div></details>
+  <main class="report">
+    <!-- ============ NOMENCLATURE ============ -->
+    <section class="annexe" id="nomenclature">
+      <h2>Nomenclature</h2>
+      <div class="grid2">
+        <div class="tablewrap"><table class="nomen"><thead><tr><th>symbole</th><th>grandeur</th><th>unité</th></tr></thead><tbody>
+          <tr><td><i>h</i>, <i>s</i></td><td class="txt">enthalpie, entropie massiques</td><td>kJ/kg, kJ/(kg·K)</td></tr>
+          <tr><td><i>h</i><sub>fg</sub></td><td class="txt">chaleur latente de vaporisation</td><td>kJ/kg</td></tr>
+          <tr><td><i>p</i>, <i>T</i></td><td class="txt">pression, température</td><td>bar, °C ou K</td></tr>
+          <tr><td><i>v</i></td><td class="txt">volume massique</td><td>m³/kg</td></tr>
+          <tr><td><i>x</i>, <i>y</i></td><td class="txt">titre en vapeur, humidité (1 − x)</td><td>–</td></tr>
+          <tr><td><i>ṁ</i></td><td class="txt">débit massique</td><td>kg/s</td></tr>
+          <tr><td><i>Q̇</i>, <i>Ẇ</i>, <i>P</i></td><td class="txt">puissance thermique, mécanique, électrique</td><td>MW</td></tr>
+          <tr><td><i>UA</i></td><td class="txt">conductance globale d'un échangeur</td><td>W/K</td></tr>
+          <tr><td><i>V</i>, <i>A</i></td><td class="txt">vitesse axiale et section annulaire d'échappement</td><td>m/s, m²</td></tr>
+        </tbody></table></div>
+        <div class="tablewrap"><table class="nomen"><thead><tr><th>symbole</th><th>grandeur</th><th>unité</th></tr></thead><tbody>
+          <tr><td><i>η</i></td><td class="txt">rendement isentropique, rendement de cycle</td><td>–</td></tr>
+          <tr><td><i>EL</i></td><td class="txt">perte d'échappement (Spencer-Cotton-Cannon)</td><td>kJ/kg</td></tr>
+          <tr><td><i>Me</i></td><td class="txt">nombre de Merkel</td><td>–</td></tr>
+          <tr><td><i>L/G</i></td><td class="txt">rapport des débits eau / air sec (tour)</td><td>–</td></tr>
+          <tr><td><i>T̄</i></td><td class="txt">température moyenne entropique</td><td>K</td></tr>
+          <tr><td><i>T</i><sub>0</sub></td><td class="txt">température de l'état mort (exergie)</td><td>K</td></tr>
+          <tr><td><i>Ex</i><sub>d</sub></td><td class="txt">exergie détruite</td><td>MW</td></tr>
+          <tr><td>ELEP, UEEP</td><td class="txt">fin de ligne de détente, état réel à l'échappement</td><td>–</td></tr>
+          <tr><td>GV, HP, BP, MSR</td><td class="txt">générateur de vapeur, haute et basse pression, sécheur-surchauffeur</td><td>–</td></tr>
+        </tbody></table></div>
       </div>
-      <footer>
-        <span>Projet réalisé par Maxime, élève ingénieur à l'IMT. Code et méthode : onglets <a href="#code">Code</a> et <a href="#demarche">Démarche</a>.</span>
-        <span>Eau et air humide : CoolProp (IAPWS-95). Solveur : TESPy 0.12. Météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0). Un assistant d'IA a servi d'aide à la programmation.</span>
-      </footer>
+    </section>
+
+    <!-- ============ 1. INTRODUCTION ============ -->
+    <section class="chap" id="ch-intro">
+      <h2>Introduction</h2>
+      <div class="sec" id="sec-contexte"><h3>Contexte</h3>
+        <p>Une centrale nucléaire ne convertit qu'environ un tiers de la chaleur produite par son réacteur en électricité. Le reste est rejeté à la source froide, au condenseur. La température de cette source froide fixe la pression au condenseur, donc la fin de la détente dans les turbines : elle conditionne directement la puissance électrique. Lors des épisodes de chaleur, la production des centrales baisse. Une part de cette baisse vient du rendement du cycle, une autre des contraintes réglementaires sur les rejets thermiques.</p>
+      </div>
+      <div class="sec" id="sec-objectifs"><h3>Objectifs</h3>
+        <ol class="obj">
+          <li>Quantifier la sensibilité de la puissance électrique d'une tranche N4 à la température de l'eau de refroidissement, installation figée et puissance du réacteur constante.</li>
+          <li>Expliquer cette sensibilité par les relations de la thermodynamique, et pas seulement la calculer.</li>
+          <li>Traduire le résultat en production réelle, sur dix ans de météo, pour les deux sites du palier N4.</li>
+          <li>Évaluer la confiance à accorder aux résultats : validation, vérifications, incertitudes.</li>
+        </ol>
+      </div>
+      <div class="sec" id="sec-demarche"><h3>Démarche et périmètre</h3>
+        <p>Le circuit secondaire est modélisé avec la bibliothèque TESPy <a class="cite" href="#ref-tespy">[1]</a>, et les propriétés de l'eau sont calculées par CoolProp <a class="cite" href="#ref-coolprop">[2]</a> selon IAPWS-95 <a class="cite" href="#ref-iapws">[3]</a>. Le modèle est d'abord dimensionné à 15 °C. L'installation est ensuite figée, et seule la température de l'eau varie. Le circuit primaire n'est représenté que par son échange au générateur de vapeur. Le fonctionnement à charge partielle, les transitoires et la régulation ne sont pas étudiés.</p>
+      </div>
+    </section>
+
+    <!-- ============ 2. INSTALLATION ============ -->
+    <section class="chap" id="ch-installation">
+      <h2>Installation étudiée</h2>
+      <div class="sec" id="sec-n4"><h3>Le palier N4</h3>
+        <p>Le palier N4 regroupe les quatre tranches les plus puissantes du parc français en exploitation : Chooz B1 et B2 dans les Ardennes, Civaux 1 et 2 dans la Vienne, mises en service à la fin des années 1990. Chaque tranche a quatre générateurs de vapeur et une turbine Arabelle (corps HP-MP, sécheurs-surchauffeurs, corps BP). Le <a class="ref" data-ref="tab-n4"></a> rassemble les ordres de grandeur publics utilisés comme référence.</p>
+        <div class="tablewrap"><table id="tab-n4" class="numtab" data-caption="Ordres de grandeur publics d'une tranche N4 retenus pour l'étude"><thead><tr><th>grandeur</th><th>valeur</th></tr></thead><tbody>
+          <tr><td class="txt">Puissance thermique du réacteur</td><td>4 270 MWth</td></tr>
+          <tr><td class="txt">Puissance électrique brute / nette</td><td>≈ 1 560 / ≈ 1 500 MWe</td></tr>
+          <tr><td class="txt">Vapeur en sortie de GV</td><td>saturée, ≈ 72 bar</td></tr>
+          <tr><td class="txt">Température d'eau alimentaire</td><td>≈ 230 °C</td></tr>
+          <tr><td class="txt">Températures primaires (entrée / sortie cuve)</td><td>≈ 292 / 329 °C</td></tr>
+          <tr><td class="txt">Refroidissement</td><td>tours aéroréfrigérantes à tirage naturel</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="sec" id="schema-card"><h3>Circuit secondaire modélisé</h3>
+        <p>La <a class="ref" data-ref="fig-schema"></a> présente le circuit modélisé. Cliquez sur un composant pour afficher ses grandeurs au point nominal.</p>
+        <figure class="fig" id="fig-schema">
+          <div class="figtools"><button class="btn plain" id="anim" aria-pressed="true">Mettre en pause</button></div>
+          <div class="schema-wrap"><div class="chart" id="schema"></div><aside class="info" id="info" aria-live="polite"></aside></div>
+          <figcaption>Schéma du circuit secondaire modélisé. Épaisseur des traits proportionnelle au débit ; orange : vapeur, bleu : eau, pointillés jaunes : soutirages, vert : eau de refroidissement.</figcaption>
+        </figure>
+      </div>
+      <div class="sec" id="sec-tour"><h3>Source froide</h3>
+        <p>Les deux sites N4 sont équipés de tours aéroréfrigérantes à tirage naturel. L'eau sortant du condenseur y est refroidie au contact de l'air, principalement par évaporation. La température de l'eau froide dépend donc des conditions de l'air, et surtout de sa température humide. Elle ne dépend pas directement de la température de la rivière.</p>
+      </div>
+    </section>
+
+    <!-- ============ 3. MODÉLISATION ============ -->
+    <section class="chap" id="ch-modelisation">
+      <h2>Modélisation</h2>
+      <div class="sec" id="sec-hyp"><h3>Hypothèses</h3>
+        <p>Le <a class="ref" data-ref="tab-hyp"></a> liste les hypothèses de modélisation et leur justification. Elles sont numérotées pour être citées dans la suite du rapport.</p>
+        <div class="tablewrap"><table id="tab-hyp" class="numtab" data-caption="Hypothèses de modélisation"><thead><tr><th>n°</th><th>hypothèse</th><th>justification</th></tr></thead><tbody id="hyp"></tbody></table></div>
+      </div>
+      <div class="sec" id="sec-offdesign"><h3>Dimensionnement et fonctionnement hors dimensionnement</h3>
+        <p>Au dimensionnement, on impose les performances, et le calcul fournit les conductances UA et les sections. Hors dimensionnement, ces grandeurs sont figées et les performances deviennent des résultats (<a class="ref" data-ref="tab-od"></a>). La pression de vapeur n'est plus imposée : elle résulte de la conductance du GV. Les soupapes de réglage HP sont laissées libres, comme sur une tranche réelle. Sans cela, la pression serait imposée deux fois, par le GV et par la loi du cône de la turbine HP.</p>
+        <div class="tablewrap"><table id="tab-od" class="numtab" data-caption="Grandeurs imposées au dimensionnement et lois qui les remplacent hors dimensionnement"><thead><tr><th>composant</th><th>dimensionnement (eau à 15 °C)</th><th>hors dimensionnement</th></tr></thead><tbody>
+          <tr><td class="txt">Générateur de vapeur</td><td class="txt">p vapeur = 72 bar, T primaire de sortie</td><td class="txt">UA (caractéristique), débit primaire figé</td></tr>
+          <tr><td class="txt">Tronçons de turbine</td><td class="txt">η isentropique (règle de Baumann), pressions de soutirage</td><td class="txt">η selon le débit, loi du cône de Stodola</td></tr>
+          <tr><td class="txt">Soupapes de réglage HP</td><td class="txt">perte de charge de 3 bar</td><td class="txt">libre</td></tr>
+          <tr><td class="txt">Réchauffeurs, surchauffeur</td><td class="txt">écart terminal</td><td class="txt">UA (caractéristique)</td></tr>
+          <tr><td class="txt">Condenseur</td><td class="txt">pincement 4 K, échauffement 10 K</td><td class="txt">UA corrigé selon T eau (éq. Dittus-Boelter), débit d'eau figé</td></tr>
+          <tr><td class="txt">Échappement BP</td><td class="txt">V = 250 m/s</td><td class="txt">section annulaire figée</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="sec" id="sec-modeles"><h3>Modèles complémentaires</h3>
+        <p><b>Pertes d'échappement BP.</b> Méthode de Spencer, Cotton et Cannon <a class="cite" href="#ref-scc">[4]</a> : l'état réellement envoyé au condenseur (UEEP) diffère de la fin de la ligne de détente (ELEP) d'une perte fonction de la vitesse axiale de sortie et de l'humidité. Au-delà de 400 m/s, l'écoulement est bloqué.</p>
+        <div class="eq" id="eq-scc"><div class="tex">\[h_{\mathrm{UEEP}} = h_{\mathrm{ELEP}} + EL(V)\cdot 0{,}87\,\bigl(1-0{,}01\,Y\bigr)\bigl(1-0{,}0065\,Y\bigr), \qquad V = \frac{\dot m\, v}{A}\]</div><span class="eqn"></span></div>
+        <figure class="fig" id="fig-el"><div class="chart" id="ch-el" style="max-width:520px"></div><figcaption>Courbe de perte d'échappement EL(V) générique et point de fonctionnement pour la température d'eau choisie en <a class="ref" data-ref="fig-p"></a>.</figcaption></figure>
+        <p><b>Humidité dans la turbine.</b> Règle de Baumann <a class="cite" href="#ref-baumann">[5]</a>, appliquée tronçon par tronçon à partir d'un rendement « vapeur sèche » :</p>
+        <div class="eq" id="eq-baumann"><div class="tex">\[\eta = \eta_{\mathrm{sec}}\,\bigl(1 - a\,y_{\mathrm{moy}}\bigr), \qquad a = 1\]</div><span class="eqn"></span></div>
+        <p><b>Conductance du condenseur.</b> Côté tubes, convection forcée turbulente (Dittus-Boelter <a class="cite" href="#ref-db">[6]</a>) à vitesse fixée. Les autres résistances sont supposées constantes. Au design, la résistance côté eau représente une fraction <i>f</i> = 0,45 de la résistance totale.</p>
+        <div class="eq" id="eq-ua"><div class="tex">\[h_{\mathrm{eau}} \propto k^{0{,}6}\,\rho^{0{,}8}\,c_p^{0{,}4}\,\mu^{-0{,}4}, \qquad \frac{UA}{UA_d} = \left[\,f\,\frac{h_{\mathrm{eau},d}}{h_{\mathrm{eau}}} + 1 - f\,\right]^{-1}\]</div><span class="eqn"></span></div>
+        <p><b>Tour aéroréfrigérante.</b> Intégrale de Merkel <a class="cite" href="#ref-merkel">[7]</a>, évaluée par la méthode de Tchebychev à 4 points <a class="cite" href="#ref-cti">[8]</a>. Le débit d'air du tirage naturel équilibre la poussée et les pertes de charge, soit (L/G)²·Δρ = constante.</p>
+        <div class="eq" id="eq-merkel"><div class="tex">\[Me = \int_{T_f}^{T_c} \frac{c_p\,\mathrm{d}T}{h_{\mathrm{sat}}(T) - h_{\mathrm{air}}(T)}, \qquad Me = Me_d \left(\frac{L/G}{(L/G)_d}\right)^{-0{,}6}\]</div><span class="eqn"></span></div>
+        <p><b>Exergie.</b> Théorème de Gouy-Stodola <a class="cite" href="#ref-bejan">[9]</a>, appliqué à chaque composant adiabatique. L'état mort est l'eau de refroidissement à l'entrée.</p>
+        <div class="eq" id="eq-gouy"><div class="tex">\[Ex_d = T_0\,\dot S_{\mathrm{gen}} = T_0 \Bigl(\sum_{\text{sorties}} \dot m\, s \;-\; \sum_{\text{entrées}} \dot m\, s\Bigr)\]</div><span class="eqn"></span></div>
+      </div>
+    </section>
+
+    <!-- ============ 4. VÉRIFICATION ET VALIDATION ============ -->
+    <section class="chap" id="ch-vv">
+      <h2>Vérification et validation</h2>
+      <div class="sec" id="sec-verif"><h3>Vérification</h3>
+        <p>La vérification contrôle que le modèle résout correctement ses propres équations. Elle repose sur 30 tests automatiques (pytest), dont les principaux sont listés ci-dessous.</p>
+        <ul class="items" id="verif"></ul>
+      </div>
+      <div class="sec" id="valid-card"><h3>Validation contre les données publiques</h3>
+        <p>La validation compare le modèle à l'installation réelle (<a class="ref" data-ref="tab-valid"></a>). Le modèle n'est pas calé : le premier calcul dépassait de 5,5 % la puissance publiée. Plutôt que d'ajuster les rendements, la physique manquante (règle de Baumann, pertes de charge) a été ajoutée. L'écart résiduel de +1,9 % s'explique par ce que le modèle ignore : fuites aux garnitures, purges des GV, vapeur auxiliaire.</p>
+        <div class="tablewrap"><table id="tab-valid" class="numtab" data-caption="Comparaison du modèle aux ordres de grandeur publics"></table></div>
+      </div>
+    </section>
+
+    <!-- ============ 5. RÉSULTATS ============ -->
+    <section class="chap" id="ch-resultats">
+      <h2>Résultats</h2>
+      <div class="sec" id="ts-card"><h3>Point de fonctionnement nominal</h3>
+        <p>À 15 °C, la tranche produit <span class="num" id="r-brut"></span> MWe bruts, pour un rendement de cycle de <span class="num" id="r-eta"></span> %. La <a class="ref" data-ref="fig-ts"></a> représente le cycle dans le diagramme T-s, et la <a class="ref" data-ref="bilan-card"></a> en donne le bilan d'énergie.</p>
+        <figure class="fig" id="fig-ts"><div class="legend" id="leg-ts"></div><div class="chart" id="ch-ts"></div><figcaption>Cycle N4 et cycle simple de référence dans le diagramme T-s, eau de refroidissement à 15 °C.</figcaption></figure>
+        <figure class="fig" id="bilan-card"><div class="figtools"><div class="seg" role="group" aria-label="Type de bilan" id="seg-bilan"><button aria-pressed="true" data-v="energie">Énergie</button><button aria-pressed="false" data-v="exergie">Exergie</button></div></div>
+          <div class="chart" id="ch-bilan"></div><figcaption id="fig-bilan-cap"><span id="titre-bilan"></span>. <span id="sub-bilan"></span></figcaption></figure>
+      </div>
+      <div class="sec" id="explorer"><h3>Sensibilité à la température de la source froide</h3>
+        <p>La <a class="ref" data-ref="fig-p"></a> donne la puissance nette en fonction de la température de l'eau à l'entrée du condenseur. Le curseur permet de lire chaque point de fonctionnement.</p>
+        <figure class="fig" id="fig-p">
+          <div class="explore"><div class="slider"><label for="teau">Température de l'eau au condenseur <output id="tval">15 °C</output></label><input type="range" id="teau" min="0" max="35" step="1" value="15"></div><span class="chip" id="chip" hidden>ÉCHAPPEMENT BLOQUÉ</span></div>
+          <div class="tiles" id="tiles"></div>
+          <div class="legend" id="leg-p"></div>
+          <div class="chart" id="ch-p"></div>
+          <figcaption><span id="titre-p"></span>. Zone grisée : écoulement bloqué en sortie de turbine BP.</figcaption>
+        </figure>
+        <p class="callout" id="lecture" aria-live="polite"></p>
+        <figure class="fig" id="fig-pc-ech"><div class="grid2"><div class="stack"><h4 class="small">Pression au condenseur (mbar)</h4><div class="chart" id="ch-pc"></div></div><div class="stack"><h4 class="small">Perte d'échappement BP (MW)</h4><div class="chart" id="ch-ech"></div></div></div>
+          <figcaption>Pression au condenseur et perte d'échappement BP en fonction de la température de l'eau.</figcaption></figure>
+      </div>
+      <div class="sec" id="annee-card"><h3>Production sur météo réelle</h3>
+        <p>La chaîne air → tour → condenseur → puissance est appliquée heure par heure à dix ans de réanalyse météo ERA5 <a class="cite" href="#ref-era5">[10]</a>, soit 87 672 heures par site. Le réacteur est supposé à pleine puissance toute l'année (hypothèse <a class="ref" data-ref="hyp-annuel"></a>).</p>
+        <figure class="fig" id="meteo-calc"><div class="figtools"><div class="seg" role="group" aria-label="Site" id="seg-site-calc"><button aria-pressed="true" data-v="chooz">Chooz</button><button aria-pressed="false" data-v="civaux">Civaux</button></div></div>
+          <div class="grid2"><div class="slider"><label for="tair">Température de l'air <output id="tair-o"></output></label><input type="range" id="tair" min="-15" max="40" step="1" value="12"></div><div class="slider"><label for="hr">Humidité relative <output id="hr-o"></output></label><input type="range" id="hr" min="10" max="100" step="5" value="75"></div></div>
+          <div class="tiles" id="tiles-meteo"></div><div class="chart" id="ch-calc"></div>
+          <figcaption>Puissance nette en fonction de la température et de l'humidité de l'air (tour couplée à la centrale). Le cercle marque les conditions choisies ; un clic sur la carte les modifie.</figcaption></figure>
+        <figure class="fig" id="fig-mois"><div class="figtools"><div class="seg" role="group" aria-label="Site" id="seg-site"><button aria-pressed="true" data-v="chooz">Chooz</button><button aria-pressed="false" data-v="civaux">Civaux</button></div></div>
+          <div class="tiles" id="tiles-annee"></div><div class="legend" id="leg-mois"></div><div class="chart" id="ch-mois"></div>
+          <figcaption><span id="titre-annee"></span>. Puissance nette moyenne par mois, climat actuel et climat +2 °C (humidité relative constante).</figcaption></figure>
+        <figure class="fig" id="fig-carte"><div class="chart" id="carte"></div><figcaption>Puissance nette moyenne journalière, 2015-2024, pour le site sélectionné ci-dessus.</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ============ 6. ANALYSE ============ -->
+    <section class="chap" id="ch-analyse">
+      <h2>Analyse et discussion</h2>
+      <div class="sec" id="clapeyron"><h3>Origine de la sensibilité : analyse à la main</h3>
+        <p>La sensibilité calculée en <a class="ref" data-ref="fig-p"></a> peut être retrouvée sans le modèle. Sur le dernier étage BP, à entropie fixée, la relation de Gibbs donne le travail perdu quand la pression d'échappement augmente :</p>
+        <div class="eq" id="eq-gibbs"><div class="tex">\[\mathrm{d}h = T\,\mathrm{d}s + v\,\mathrm{d}p \quad\Longrightarrow\quad \mathrm{d}\dot W = -\,\eta\,\dot m\, v_s\,\mathrm{d}p\]</div><span class="eqn"></span></div>
+        <p>La relation de Clapeyron relie pression et température de saturation. Avec <i>v<sub>f</sub></i> ≪ <i>v<sub>g</sub></i> et <i>v<sub>s</sub></i> ≈ <i>x v<sub>g</sub></i> :</p>
+        <div class="eq" id="eq-clap"><div class="tex">\[\frac{\mathrm{d}p}{\mathrm{d}T} = \frac{h_{fg}}{T\,(v_g - v_f)} \quad\Longrightarrow\quad \frac{\mathrm{d}\dot W}{\mathrm{d}T_c} \approx -\,\frac{\eta\,\dot m\,x\,h_{fg}}{T_c} = -\,\frac{\eta\,\dot Q_{\mathrm{lat}}}{T_c}\]</div><span class="eqn"></span></div>
+        <p>Le cycle à soutirages ajoute un terme de signe opposé. Un condensat plus chaud de <i>dT</i> demande moins de vapeur au réchauffeur RBP1, et cette vapeur épargnée se détend jusqu'au condenseur :</p>
+        <div class="eq" id="eq-credit"><div class="tex">\[\mathrm{d}\dot W = \frac{\dot m_c\, c_p\,\mathrm{d}T}{h_x - h_{\mathrm{purge}}}\,\bigl(h_{e6} - h_2\bigr)\]</div><span class="eqn"></span></div>
+        <div class="grid2">
+          <div class="tablewrap"><table id="tab-clap" class="numtab" data-caption="Application numérique des équations au point nominal"></table></div>
+          <figure class="fig" id="fig-wf"><div class="chart" id="ch-wf"></div><figcaption>Décomposition de la pente dP/dT<sub>c</sub> entre 15 et 20 °C (MW par K de condensation).</figcaption></figure>
+        </div>
+        <p id="cap-wf"></p>
+      </div>
+      <div class="sec" id="tmoy"><h3>Gain du réchauffage : température moyenne entropique</h3>
+        <div class="eq" id="eq-tmoy"><div class="tex">\[\bar T_{\mathrm{apport}} = \frac{h_1 - h_0}{s_1 - s_0}, \qquad \eta_{\mathrm{endo}} = 1 - \frac{T_c}{\bar T_{\mathrm{apport}}}\]</div><span class="eqn"></span></div>
+        <p id="txt-tm"></p>
+        <figure class="fig" id="fig-tm"><div class="chart" id="ch-tm"></div><figcaption>Rendements de Carnot (chaleur reçue à la température de la vapeur vive), endoréversible (chaleur reçue à T̄) et réel, pour les deux cycles.</figcaption></figure>
+      </div>
+      <div class="sec" id="pincement"><h3>Échangeurs : pincements</h3>
+        <p>La <a class="ref" data-ref="fig-tq"></a> donne les profils de température dans le GV et le condenseur. <span id="t-tq-gv"></span>, <span id="t-tq-cond"></span>. La température de condensation suit celle de l'eau de refroidissement à <span id="dtc"></span>.</p>
+        <figure class="fig" id="fig-tq"><div class="grid2"><div class="stack"><div class="legend"><span><i style="border-color:var(--s2)"></i>primaire</span><span><i style="border-color:var(--s1)"></i>secondaire</span></div><div class="chart" id="ch-tq-gv"></div></div><div class="stack"><div class="legend"><span><i style="border-color:var(--s2)"></i>vapeur qui condense</span><span><i style="border-color:var(--s3)"></i>eau de refroidissement</span></div><div class="chart" id="ch-tq-cond"></div></div></div>
+          <figcaption>Diagrammes T-Q du générateur de vapeur (gauche) et du condenseur (droite) au point nominal.</figcaption></figure>
+      </div>
+      <div class="sec" id="mollier"><h3>Détentes dans le diagramme de Mollier</h3>
+        <p>Chaque tronçon de turbine s'écarte d'autant plus de la détente isentropique que la vapeur est humide (<a class="ref" data-ref="eq-baumann"></a>). Le sécheur-surchauffeur ramène la vapeur dans la zone sèche avant la BP (<a class="ref" data-ref="fig-hs"></a>).</p>
+        <figure class="fig" id="fig-hs"><div class="legend"><span><i style="border-color:var(--s1)"></i>turbine HP</span><span><i style="border-color:var(--s2)"></i>sécheur-surchauffeur</span><span><i style="border-color:var(--s3)"></i>turbine BP</span><span><i class="dash" style="border-color:var(--fg-3)"></i>détente isentropique</span></div><div class="chart" id="ch-hs"></div>
+          <figcaption>Lignes de détente des sept tronçons dans le diagramme h-s, avec les isobares de soutirage. Survol : rendement effectif de chaque tronçon.</figcaption></figure>
+      </div>
+      <div class="sec" id="sec-exergie"><h3>Analyse exergétique</h3>
+        <p id="txt-exergie-rapport"></p>
+      </div>
+      <div class="sec" id="inc-card"><h3>Incertitudes</h3>
+        <p id="sub-inc"></p>
+        <figure class="fig" id="fig-inc"><div class="grid2"><div class="stack"><h4 class="small">Puissance nette, médiane et intervalle 5-95 %</h4><div class="chart" id="ch-inc"></div></div><div class="stack"><h4 class="small">Tornade : effet sur la pente</h4><div class="legend"><span><i class="box" style="background:var(--s2)"></i>borne basse</span><span><i class="box" style="background:var(--s1)"></i>borne haute</span></div><div class="chart" id="ch-tor"></div></div></div>
+          <figcaption><span id="titre-inc"></span>.</figcaption></figure>
+      </div>
+      <div class="sec" id="rejets-card"><h3>Variante en circuit ouvert : contraintes de rejet</h3>
+        <p>Avec une tour, la chaleur part dans l'air et la limite de rejet en rivière pèse peu. Si la même tranche était refroidie directement par la rivière, ses ≈ 2 600 MW rejetés réchaufferaient le cours d'eau, et l'arrêté de rejet imposerait des baisses de puissance. Les limites utilisées sont illustratives et réglables.</p>
+        <figure class="fig" id="fig-rej"><div class="grid2"><div class="slider"><label for="dtmax">Échauffement maximal de la rivière <output id="dtmax-o"></output></label><input type="range" id="dtmax" min="1" max="6" step="0.5" value="3"></div><div class="slider"><label for="tavmax">Température aval maximale <output id="tavmax-o"></output></label><input type="range" id="tavmax" min="22" max="32" step="0.5" value="28"></div></div>
+          <div class="chart" id="ch-rej"></div><figcaption>Puissance nette admissible selon la température et le débit de la rivière (variante en circuit ouvert, limites illustratives).</figcaption></figure>
+        <p id="cap-rej"></p>
+      </div>
+      <div class="sec" id="sec-limites"><h3>Limites de l'étude</h3>
+        <ul class="items" id="limites"></ul>
+      </div>
+    </section>
+
+    <!-- ============ 7. CONCLUSIONS ============ -->
+    <section class="chap" id="ch-conclusions">
+      <h2>Conclusions et perspectives</h2>
+      <div class="sec"><h3>Conclusions</h3><ol class="obj" id="conclusions"></ol></div>
+      <div class="sec"><h3>Perspectives</h3>
+        <ol class="obj">
+          <li>Remplacer la courbe de pertes d'échappement générique par une courbe constructeur. C'est l'hypothèse qui pèse le plus sur l'optimum (<a class="ref" data-ref="fig-inc"></a>).</li>
+          <li>Étendre le modèle à la charge partielle, pour traiter correctement les baisses de puissance imposées par les rejets.</li>
+          <li>Compléter le modèle de tour (vent, recirculation du panache, antigel).</li>
+          <li>Pour la variante en circuit ouvert, utiliser les chroniques réelles de débit et de température de rivière.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ RÉFÉRENCES ============ -->
+    <section class="annexe" id="references">
+      <h2>Références</h2>
+      <ol class="refs">
+        <li id="ref-tespy">F. Witte, I. Tuschy, « TESPy: Thermal Engineering Systems in Python », <i>Journal of Open Source Software</i>, 5(49), 2178, 2020.</li>
+        <li id="ref-coolprop">I. H. Bell, J. Wronski, S. Quoilin, V. Lemort, « Pure and Pseudo-pure Fluid Thermophysical Property Evaluation and the Open-Source Thermophysical Property Library CoolProp », <i>Industrial &amp; Engineering Chemistry Research</i>, 53(6), 2498-2508, 2014.</li>
+        <li id="ref-iapws">W. Wagner, A. Pruß, « The IAPWS Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance for General and Scientific Use », <i>Journal of Physical and Chemical Reference Data</i>, 31(2), 387-535, 2002.</li>
+        <li id="ref-scc">R. C. Spencer, K. C. Cotton, C. N. Cannon, « A Method for Predicting the Performance of Steam Turbine-Generators… 16,500 kW and Larger », <i>Journal of Engineering for Power</i>, 85(4), 249-301, 1963.</li>
+        <li id="ref-baumann">K. Baumann, « Some Recent Developments in Large Steam Turbine Practice », <i>Journal of the Institution of Electrical Engineers</i>, 59, 565-623, 1921.</li>
+        <li id="ref-db">F. W. Dittus, L. M. K. Boelter, « Heat Transfer in Automobile Radiators of the Tubular Type », <i>University of California Publications in Engineering</i>, 2, 443-461, 1930.</li>
+        <li id="ref-merkel">F. Merkel, « Verdunstungskühlung », <i>VDI-Forschungsheft</i> 275, 1925.</li>
+        <li id="ref-cti">Cooling Technology Institute, <i>ATC-105 : Acceptance Test Code for Water Cooling Towers</i>.</li>
+        <li id="ref-bejan">A. Bejan, <i>Advanced Engineering Thermodynamics</i>, 4e éd., Wiley, 2016.</li>
+        <li id="ref-era5">H. Hersbach et al., « The ERA5 global reanalysis », <i>Quarterly Journal of the Royal Meteorological Society</i>, 146(730), 1999-2049, 2020. Données via Open-Meteo (CC BY 4.0).</li>
+      </ol>
+    </section>
+
+    <!-- ============ ANNEXES ============ -->
+    <section class="annexe" id="annexe-etats">
+      <h2>Annexe A · États thermodynamiques au point nominal</h2>
+      <div class="tablewrap"><table id="tab-etats" class="numtab" data-caption="États thermodynamiques aux principaux points du cycle N4, eau à 15 °C"></table></div>
+      <div class="tablewrap"><table id="tab-odg" class="numtab" data-caption="Ordres de grandeur utiles"></table></div>
+    </section>
+
+    <section class="annexe" id="annexe-code">
+      <h2>Annexe B · Code source</h2>
+      <p class="sub" id="code-titre"></p>
+      <p class="sub">Python 3.12, TESPy, CoolProp. Chaque modèle physique a son module et ses tests. Pour reproduire l'étude : <code>pip install -r requirements.txt</code>, <code>pytest</code>, <code>python scripts/figures_rapport.py</code>.</p>
+      <div class="code-wrap">
+        <nav class="files" id="files" aria-label="Fichiers"></nav>
+        <article class="viewer"><div class="viewer-head"><div class="stack" style="gap:2px"><span class="mono" id="v-path"></span><span class="cap" id="v-note"></span></div><span class="cap mono" id="v-lines"></span></div><div class="code" id="v-code"></div></article>
+      </div>
+    </section>
+
+    <section class="annexe" id="annexe-journal">
+      <h2>Annexe C · Journal de développement</h2>
+      <p class="sub">Les dix itérations du modèle, chacune déclenchée par un résultat qui ne tenait pas.</p>
+      <ol class="timeline" id="timeline"></ol>
+      <h3 class="small" style="margin-top:8px">Enseignements</h3>
+      <ul class="items" id="retiens"></ul>
+      <p class="sub" style="margin-top:12px">Outils : Python 3.12, TESPy 0.12, CoolProp, pandas, SciPy, matplotlib. Un assistant d'IA a servi d'aide à la programmation. Les choix de modélisation, les vérifications et l'interprétation sont décrits dans ce rapport, et chacun est couvert par un test.</p>
     </section>
   </main>
 </div>
-</div>
 
-<!-- ===================== ONGLET THERMODYNAMIQUE ===================== -->
-<div class="tab" id="tab-thermo" hidden>
-  <div class="page">
-    <header class="page-head">
-      <h1>Comprendre les chiffres, pas seulement les calculer</h1>
-      <p>Chaque résultat important du modèle est redémontré ici à la main, avec les relations de base de la thermodynamique, puis confronté au calcul numérique. Quand les deux divergent, l'écart a une cause physique identifiée.</p>
-    </header>
-
-    <article class="card" id="clapeyron">
-      <h3>Pourquoi un degré de plus au condenseur coûte environ 7 MW : la démonstration par Clapeyron</h3>
-      <div class="grid2">
-        <div class="deriv">
-          <p><b>Travail perdu sur le dernier étage.</b> À entropie fixée, la relation de Gibbs donne la variation d'enthalpie de fin de détente quand la pression d'échappement monte :</p>
-          <math display="block"><mi>d</mi><mi>h</mi><mo>=</mo><mi>T</mi><mi>d</mi><mi>s</mi><mo>+</mo><mi>v</mi><mi>d</mi><mi>p</mi><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>η</mi><mspace width="0.2em"/><mover><mi>m</mi><mo>˙</mo></mover><mspace width="0.2em"/><msub><mi>v</mi><mi>s</mi></msub><mspace width="0.2em"/><mi>d</mi><mi>p</mi></math>
-          <p><b>Lien pression-température à saturation</b> (Clapeyron), avec <i>v<sub>f</sub></i> ≪ <i>v<sub>g</sub></i> et <i>v<sub>s</sub></i> ≈ <i>x v<sub>g</sub></i> :</p>
-          <math display="block"><mfrac><mrow><mi>d</mi><mi>p</mi></mrow><mrow><mi>d</mi><mi>T</mi></mrow></mfrac><mo>=</mo><mfrac><msub><mi>h</mi><mrow><mi>f</mi><mi>g</mi></mrow></msub><mrow><mi>T</mi><mo>(</mo><msub><mi>v</mi><mi>g</mi></msub><mo>−</mo><msub><mi>v</mi><mi>f</mi></msub><mo>)</mo></mrow></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mfrac><mrow><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover></mrow><mrow><mi>d</mi><msub><mi>T</mi><mi>c</mi></msub></mrow></mfrac><mo>≈</mo><mo>−</mo><mfrac><mrow><mi>η</mi><mspace width="0.2em"/><mover><mi>m</mi><mo>˙</mo></mover><mspace width="0.2em"/><mi>x</mi><mspace width="0.2em"/><msub><mi>h</mi><mrow><mi>f</mi><mi>g</mi></mrow></msub></mrow><msub><mi>T</mi><mi>c</mi></msub></mfrac><mo>=</mo><mo>−</mo><mfrac><mrow><mi>η</mi><mspace width="0.2em"/><msub><mover><mi>Q</mi><mo>˙</mo></mover><mtext>lat</mtext></msub></mrow><msub><mi>T</mi><mi>c</mi></msub></mfrac></math>
-          <p>C'est la forme « de terrain » de <i>dW = −Q dT/T</i> : la chaleur rejetée au condenseur, multipliée par la hausse relative de sa température absolue, et pondérée par le rendement du dernier étage.</p>
-          <p><b>Crédit de régénération.</b> Un condensat plus chaud de <i>dT</i> demande moins de vapeur au réchauffeur RBP1 :</p>
-          <math display="block"><mi>d</mi><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>x</mi></msub><mo>=</mo><mfrac><mrow><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>c</mi></msub><mspace width="0.2em"/><msub><mi>c</mi><mi>p</mi></msub><mspace width="0.2em"/><mi>d</mi><mi>T</mi></mrow><mrow><msub><mi>h</mi><mi>x</mi></msub><mo>−</mo><msub><mi>h</mi><mtext>purge</mtext></msub></mrow></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>d</mi><mover><mi>W</mi><mo>˙</mo></mover><mo>=</mo><mi>d</mi><msub><mover><mi>m</mi><mo>˙</mo></mover><mi>x</mi></msub><mo>(</mo><msub><mi>h</mi><mrow><mi>e</mi><mn>6</mn></mrow></msub><mo>−</mo><msub><mi>h</mi><mn>2</mn></msub><mo>)</mo></math>
-          <p>Cette vapeur épargnée poursuit sa détente jusqu'au condenseur : le cycle à soutirages compense donc une partie de la perte.</p>
-        </div>
-        <div class="stack">
-          <div class="tablewrap"><table id="tab-clap"></table></div>
-          <h3 class="small">Décomposition de la pente, eau entre 15 et 20 °C (MW par K de condensation)</h3>
-          <div class="chart" id="ch-wf"></div>
-          <p class="cap" id="cap-wf"></p>
-        </div>
-      </div>
-    </article>
-
-    <article class="card" id="tmoy">
-      <h3>Pourquoi le réchauffage fait gagner 5 points : la température moyenne entropique</h3>
-      <div class="grid2">
-        <div class="deriv">
-          <p>Un cycle qui reçoit sa chaleur entre l'eau alimentaire (état 0) et la vapeur vive (état 1) se compare à un cycle réversible qui la recevrait à une température unique :</p>
-          <math display="block"><msub><mover><mi>T</mi><mo>‾</mo></mover><mtext>apport</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>h</mi><mn>1</mn></msub><mo>−</mo><msub><mi>h</mi><mn>0</mn></msub></mrow><mrow><msub><mi>s</mi><mn>1</mn></msub><mo>−</mo><msub><mi>s</mi><mn>0</mn></msub></mrow></mfrac><mspace width="2em"/><msub><mi>η</mi><mtext>endo</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><msub><mi>T</mi><mi>c</mi></msub><msub><mover><mi>T</mi><mo>‾</mo></mover><mtext>apport</mtext></msub></mfrac></math>
-          <p id="txt-tm"></p>
-        </div>
-        <div class="stack"><div class="chart" id="ch-tm"></div><p class="cap">Carnot : chaleur reçue à la température de la vapeur vive. Endoréversible : chaleur reçue à T̄. Réel : rendement du modèle.</p></div>
-      </div>
-    </article>
-
-    <article class="card" id="pincement">
-      <h3>Les pincements : là où l'échange de chaleur est limité</h3>
-      <p class="sub">Profils de température le long des échangeurs (diagramme T-Q). L'écart minimal entre les deux fluides, le pincement, fixe ce qu'un échangeur peut transmettre avec une surface donnée.</p>
-      <div class="grid2">
-        <div class="stack"><h3 class="small" id="t-tq-gv"></h3><div class="legend"><span><i style="border-color:var(--s2)"></i>primaire</span><span><i style="border-color:var(--s1)"></i>secondaire</span></div><div class="chart" id="ch-tq-gv"></div><p class="cap">Le pincement apparaît au début de l'ébullition : c'est lui qui fixe la pression de vapeur pour une température primaire donnée, d'où l'intérêt de préchauffer l'eau alimentaire.</p></div>
-        <div class="stack"><h3 class="small" id="t-tq-cond"></h3><div class="legend"><span><i style="border-color:var(--s2)"></i>vapeur qui condense</span><span><i style="border-color:var(--s3)"></i>eau de refroidissement</span></div><div class="chart" id="ch-tq-cond"></div><p class="cap">La vapeur condense à température constante, et le pincement se trouve à la sortie de l'eau. Toute hausse de l'eau d'entrée se répercute presque degré pour degré sur la condensation (pente calculée : <span id="dtc"></span>).</p></div>
-      </div>
-    </article>
-
-    <article class="card" id="mollier">
-      <h3>Les détentes dans le diagramme de Mollier</h3>
-      <p class="sub">Chaque tronçon de turbine s'écarte de la détente isentropique (verticale en pointillés) d'autant plus que la vapeur est humide : c'est la règle de Baumann. Le sécheur-surchauffeur ramène la vapeur dans la zone sèche avant la turbine BP. Survolez un tronçon.</p>
-      <div class="legend"><span><i style="border-color:var(--s1)"></i>turbine HP</span><span><i style="border-color:var(--s2)"></i>sécheur-surchauffeur</span><span><i style="border-color:var(--s3)"></i>turbine BP</span><span><i class="dash" style="border-color:var(--fg-3)"></i>détente isentropique</span></div>
-      <div class="chart" id="ch-hs"></div>
-    </article>
-
-    <article class="card">
-      <h3>Les chiffres à avoir en tête</h3>
-      <div class="tablewrap"><table id="tab-odg"></table></div>
-    </article>
-  </div>
-</div>
-
-<!-- ===================== ONGLET CODE ===================== -->
-<div class="tab" id="tab-code" hidden>
-  <div class="page wide">
-    <header class="page-head">
-      <h1 id="code-titre">Le code</h1>
-      <p>Python, TESPy pour la résolution du réseau, CoolProp pour les propriétés de l'eau et de l'air humide. Chaque modèle physique a son module, et chaque module a ses tests. Les fichiers ci-dessous sont ceux qui portent la physique du projet.</p>
-      <div class="cmds"><code>pip install -r requirements.txt</code><code>pytest</code><code>python scripts/figures_rapport.py</code></div>
-    </header>
-    <div class="code-wrap">
-      <nav class="files" id="files" aria-label="Fichiers"></nav>
-      <article class="viewer">
-        <div class="viewer-head"><div class="stack" style="gap:2px"><span class="mono" id="v-path"></span><span class="cap" id="v-note"></span></div><span class="cap mono" id="v-lines"></span></div>
-        <div class="code" id="v-code"></div>
-      </article>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== ONGLET DÉMARCHE ===================== -->
-<div class="tab" id="tab-demarche" hidden>
-  <div class="page">
-    <header class="page-head">
-      <h1>Comment le modèle a été construit, corrigé et validé</h1>
-      <p>Le point de départ était une question d'élève ingénieur : pourquoi la production d'une centrale baisse-t-elle quand il fait chaud, et de combien ? La réponse a demandé dix itérations. Chacune a commencé par un résultat qui ne tenait pas debout.</p>
-    </header>
-    <ol class="timeline" id="timeline"></ol>
-    <article class="card">
-      <h3>Ce que j'en retiens</h3>
-      <ul class="items" id="retiens"></ul>
-    </article>
-    <article class="card">
-      <h3>Outils et transparence</h3>
-      <p class="sub">Python 3.12, TESPy 0.12 (résolution de réseaux thermiques), CoolProp (IAPWS-95 et air humide), pandas, SciPy, matplotlib. Données météo : Open-Meteo, réanalyse ERA5 (CC BY 4.0). Un assistant d'IA a servi d'aide à la programmation. Les choix de modélisation, les vérifications et l'interprétation des résultats sont détaillés ci-dessus, et chacun est couvert par un test.</p>
-    </article>
-  </div>
-</div>
-
+<script>
+window.MathJax = {
+  tex: { displayMath: [["\\[", "\\]"]], inlineMath: [["\\(", "\\)"]] },
+  svg: { fontCache: "global" },
+  options: { enableMenu: false },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 const D = /*__DONNEES__*/null;
@@ -923,15 +1038,6 @@ function rejets() {
     D.etats.filter((e) => lib[e.id]).map((e) => `<tr><td class="txt">${lib[e.id]}</td><td>${fr(e.m)}</td><td>${fr(e.p, e.p < 1 ? 4 : 2)}</td><td>${fr(e.T, 1)}</td><td>${fr(e.h, 1)}</td><td>${e.x > 0 && e.x < 1 ? fr(e.x, 3) : "—"}</td></tr>`).join("") + `</tbody>`;
   const prm = D.parametres, ps = prm.p_soutirages_bar;
   const items = (id, arr) => { $(id).innerHTML = arr.map(([t, d]) => `<li><b>${t}</b><span>${d}</span></li>`).join(""); };
-  items("hyp", [
-    ["Primaire et GV", `Puissance au secondaire = ${fr(prm.puissance_thermique_MW)} MW. Primaire ${fr(prm.T_primaire_chaud_C)} → ${fr(prm.T_primaire_froid_C)} °C. En offdesign, la pression vapeur est calculée par le UA du GV, à débit primaire fixé.`],
-    ["Turbines", `Rendements « vapeur sèche » HP ${fr(prm.rendement_isentropique_HP, 2)} et BP ${fr(prm.rendement_isentropique_BP, 2)}, pénalisés par la règle de Baumann. Loi du cône de Stodola en offdesign. Soupapes HP : ${fr(prm.dp_admission_HP_bar)} bar au design, libres ensuite.`],
-    ["Soutirages", `RHP2 ${fr(ps.RHP2)}, RHP1 ${fr(ps.RHP1)}, bâche ${fr(ps.bache)}, RBP3 ${fr(ps.RBP3)}, RBP2 ${fr(ps.RBP2, 1)}, RBP1 ${fr(ps.RBP1, 1)} bar. Écart terminal ${fr(prm.ttd_rechauffeurs_K)} K, purges en cascade.`],
-    ["Sécheur-surchauffeur", `Séparation idéale. Surchauffe par vapeur vive jusqu'à T_sat − ${fr(prm.ttd_surchauffeur_K)} K.`],
-    ["Condenseur", `Pincement ${fr(prm.pincement_condenseur_K)} K et échauffement ${fr(prm.echauffement_eau_refroidissement_K)} K au design. Débit d'eau fixé et UA corrigé selon la température d'eau en offdesign.`],
-    ["Tour", `Dimensionnée pour un air à ${fr(D.tour.T_seche_C)} °C et ${fr(100 * D.tour.HR)} % d'humidité, eau froide ${fr(D.tour.T_eau_froide_C)} °C. Merkel (Le = 1), tirage naturel, débit d'eau constant.`],
-    ["Production annuelle", "Réacteur à pleine puissance toute l'année, sans arrêt ni suivi de charge : c'est un maximum théorique."],
-  ]);
   items("verif", [["Calcul indépendant", "Cycle simple recalculé sans TESPy : écart inférieur à 10⁻⁵."], ["Bilans", "Énergie et matière fermés à la précision machine (N4)."], ["Second principe", "Aucune entropie détruite négative, composant par composant. Bilan d'exergie fermé."], ["Tour", "Tchebychev comparé à une intégration fine : écart inférieur à 1 %. Eau jamais sous la température humide."], ["Offdesign", "Le calcul à 15 °C redonne le design. La pression GV calculée reste à 72 bar ± 0,5."]]);
   items("limites", [["Courbe d'échappement générique", "Les courbes de la turbine Arabelle ne sont pas publiques. C'est l'hypothèse la plus influente sur l'optimum."], ["Limites de rejet illustratives", "Chaque site a son propre arrêté de rejet."], ["Tour simplifiée", "Pas de vent, pas de recirculation de panache, pas d'antigel : l'eau froide est simplement bornée à 0-35 °C."], ["Charge partielle", "Rendement supposé constant quand la puissance est réduite pour respecter les rejets."]]);
 })();
@@ -993,8 +1099,8 @@ const TH = D.thermo;
 
 (function tq() {
   const g = TH.TQ_gv, c = TH.TQ_condenseur;
-  $("t-tq-gv").textContent = `Générateur de vapeur : pincement de ${fr(g.pincement_K, 1)} K au début de l'ébullition`;
-  $("t-tq-cond").textContent = `Condenseur : pincement de ${fr(c.pincement_K, 1)} K à la sortie de l'eau`;
+  $("t-tq-gv").textContent = `Dans le GV, le pincement vaut ${fr(g.pincement_K, 1)} K, au début de l'ébullition`;
+  $("t-tq-cond").textContent = `au condenseur, il vaut ${fr(c.pincement_K, 1)} K, à la sortie de l'eau`;
   const annot = (q, T1, T2) => (X, Y) => `<line x1="${X(q)}" x2="${X(q)}" y1="${Y(T1)}" y2="${Y(T2)}" stroke="var(--fg)" stroke-width="1.5"/><text class="lbl" x="${X(q) + 6}" y="${(Y(T1) + Y(T2)) / 2 + 4}">${fr(T1 - T2, 1)} K</text>`;
   const ig = g.Q_MW.reduce((b, q, i) => (Math.abs(q - g.Q_pincement_MW) < Math.abs(g.Q_MW[b] - g.Q_pincement_MW) ? i : b), 0);
   lineChart("ch-tq-gv", { aria: "Diagramme T-Q du générateur de vapeur", x: g.Q_MW, w: 460, h: 270, unit: "°C", td: 1, xlabel: "Puissance échangée cumulée (MW)", xfmt: (q) => `${fr(q)} MW`,
@@ -1073,9 +1179,9 @@ const TH = D.thermo;
     "tests/test_verification_independante.py": ["Tests : vérification indépendante", "Le cycle simple recalculé sans TESPy doit coïncider à 10⁻⁵."],
   };
   const files = Object.keys(D.sources || {});
-  if (!files.length) { $("tab-code").querySelector(".code-wrap").hidden = true; return; }
+  if (!files.length) { document.querySelector(".code-wrap").hidden = true; return; }
   const total = files.reduce((n, f) => n + D.sources[f].split("\n").length, 0);
-  $("code-titre").textContent = `Le code : ${fr(total)} lignes de Python pour la physique et ses tests`;
+  $("code-titre").textContent = `${fr(total)} lignes de Python : les modules qui portent la physique du projet et leurs tests.`;
   const nav = $("files");
   let html = "", grp = "";
   for (const f of files) {
@@ -1122,36 +1228,56 @@ const TH = D.thermo;
   ].map(([a, b]) => `<li><b>${a}</b><span>${b}</span></li>`).join("");
 })();
 
-/* ================= NAVIGATION PAR ONGLETS ================= */
-(function router() {
-  const TABS = ["etude", "thermo", "code", "demarche"];
-  const liens = [...document.querySelectorAll(".tabs a")];
-  function afficher(nom, cible) {
-    TABS.forEach((t) => { $(`tab-${t}`).hidden = t !== nom; });
-    liens.forEach((a) => { if (a.dataset.tab === nom) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
-    if (cible) requestAnimationFrame(() => cible.scrollIntoView({ block: "start" }));
-    else window.scrollTo(0, 0);
-  }
-  function route(h) {
-    h = h ?? decodeURIComponent(location.hash.slice(1));
-    if (TABS.includes(h)) return afficher(h);
-    const el = h && document.getElementById(h);
-    if (el) { const t = el.closest(".tab"); return afficher(t ? t.id.replace("tab-", "") : "etude", el); }
-    afficher("etude");
-  }
-  window.addEventListener("hashchange", () => route());
-  // Les liens internes routent aussi directement (l'événement hashchange
-  // n'est pas garanti dans tous les cadres d'affichage).
-  document.addEventListener("click", (e) => {
-    const a = e.target.closest('a[href^="#"]');
-    if (!a) return;
-    const h = a.getAttribute("href").slice(1);
-    if (!h) return;
-    e.preventDefault();
-    try { history.replaceState(null, "", `#${h}`); } catch (err) {}
-    route(h);
-  });
-  route();
+
+/* ================= RAPPORT : textes générés depuis les résultats ================= */
+$("r-brut").textContent = fr(Dz.puissance_electrique_brute_MW);
+$("r-eta").textContent = fr(100 * Dz.rendement_cycle, 1);
+
+(function hypotheses() {
+  const prm = D.parametres, ps = prm.p_soutirages_bar;
+  const H = [
+    ["Puissance transmise au secondaire égale à la puissance du réacteur (" + fr(prm.puissance_thermique_MW) + " MW).", "Apport des pompes primaires et pertes thermiques négligés (moins de 1 %)."],
+    ["Vapeur saturée sèche en sortie de GV.", "Le titre réel vaut environ 0,9975 après les sécheurs internes du GV."],
+    [`Pressions de soutirage : RHP2 ${fr(ps.RHP2)}, RHP1 ${fr(ps.RHP1)}, bâche ${fr(ps.bache)}, RBP3 ${fr(ps.RBP3)}, RBP2 ${fr(ps.RBP2, 1)}, RBP1 ${fr(ps.RBP1, 1)} bar.`, "Elles donnent une eau alimentaire à 231 °C, cohérente avec la valeur publiée."],
+    [`Rendements isentropiques « vapeur sèche » HP ${fr(prm.rendement_isentropique_HP, 2)} et BP ${fr(prm.rendement_isentropique_BP, 2)}, pénalisés par la règle de Baumann (a = ${fr(prm.coefficient_baumann, 1)}).`, "Valeurs usuelles pour de grandes turbines à vapeur saturée. Propagées en incertitude (§ 6.5)."],
+    [`Écart terminal des réchauffeurs ${fr(prm.ttd_rechauffeurs_K)} K, du surchauffeur ${fr(prm.ttd_surchauffeur_K)} K. Pertes de charge : soupapes HP ${fr(prm.dp_admission_HP_bar)} bar, MSR ${fr(prm.dp_surchauffeur_bar, 1)} bar.`, "Ordres de grandeur de conception."],
+    [`Condenseur : pincement ${fr(prm.pincement_condenseur_K)} K, échauffement ${fr(prm.echauffement_eau_refroidissement_K)} K au design. UA corrigé selon la température d'eau avec f = ${fr(prm.part_resistance_cote_eau, 2)}.`, "f est l'hypothèse la plus incertaine de la correction de UA. Propagée en incertitude."],
+    [`Pertes d'échappement : courbe générique de forme SCC, section fixée pour ${fr(prm.vitesse_annulaire_design_m_s)} m/s au design, blocage à ${fr(prm.vitesse_annulaire_blocage_m_s)} m/s.`, "Les courbes constructeur ne sont pas publiques. C'est l'hypothèse la plus influente sur l'optimum."],
+    [`Pompes à entraînement électrique (rendement moteur ${fr(prm.rendement_moteur_pompe, 2)}), alternateur et mécanique ${fr(prm.rendement_meca_alternateur, 3)}.`, "Les turbopompes alimentaires réelles ne sont pas modélisées."],
+    [`Tour conçue pour un air à ${fr(D.tour.T_seche_C)} °C et ${fr(100 * D.tour.HR)} % d'humidité, eau froide ${fr(D.tour.T_eau_froide_C)} °C, L/G = ${fr(D.tour.L_G, 1)}, nombre de Lewis égal à 1.`, "Les données de conception des tours ne sont pas publiques. Ce sont des ordres de grandeur."],
+    ["Réacteur à pleine puissance toute l'année.", "L'énergie annuelle calculée est un maximum théorique (pas d'arrêts, pas de suivi de charge)."],
+    ["Limites de rejet en circuit ouvert : échauffement et température aval (valeurs réglables).", "Valeurs illustratives : chaque site a son propre arrêté de rejet."],
+  ];
+  $("hyp").innerHTML = H.map(([h, j], i) => `<tr id="${i === 9 ? "hyp-annuel" : `hyp-${i + 1}`}" data-h="H${i + 1}"><td>H${i + 1}</td><td class="txt" style="white-space:normal">${esc(h)}</td><td class="txt" style="white-space:normal;color:var(--fg-2)">${esc(j)}</td></tr>`).join("");
+})();
+
+(function exergieTexte() {
+  const d = Object.entries(Ex.destructions_MW).sort((a, b) => b[1] - a[1]);
+  $("txt-exergie-rapport").innerHTML = `Le primaire fournit ${fr(Ex.exergie_primaire_MW)} MW d'exergie (état mort : eau à ${fr(Ex.T0_C)} °C), dont ${fr(100 * Ex.rendement_exergetique, 1)} % deviennent de l'électricité (<a class="ref" data-ref="eq-gouy"></a>). Les premiers postes de destruction sont la ${esc(d[0][0].toLowerCase())} (${fr(d[0][1])} MW), à cause de l'humidité dans les derniers étages, puis les ${esc(d[1][0].toLowerCase())} (${fr(d[1][1])} MW) et la ${esc(d[2][0].toLowerCase())} (${fr(d[2][1])} MW). Le condenseur, qui domine le bilan d'énergie, ne détruit que ${fr(Ex.destructions_MW["Condenseur"])} MW d'exergie : sa chaleur est rejetée à 29 °C, presque à la température ambiante. Le détail figure en <a class="ref" data-ref="bilan-card"></a> (mode « Exergie »). Le bilan est fermé à la précision machine.`;
+})();
+
+(function conclusions() {
+  const I = D.incertitudes, d = TH.decomposition, a = TH.T_moyennes.n4, b = TH.T_moyennes.simple, cz = A.chooz, c2 = A["chooz_+2"];
+  const items = [
+    `Au-dessus de 15 °C, chaque degré d'eau de refroidissement coûte <b>${fr(-pente, 1)} MWe</b>, soit ${fr(-100 * pente / Dz.puissance_electrique_nette_MW, 2)} % de la puissance nette (<a class="ref" data-ref="fig-p"></a>).` + (I ? ` Ce résultat est robuste : l'intervalle 5-95 % va de ${fr(I.pente_q[0], 1)} à ${fr(I.pente_q[2], 1)} MWe/°C.` : ""),
+    `La puissance passe par un maximum de ${fr(S.P_optimum)} MWe vers ${fr(S.T_optimum)} °C. En eau plus froide, les pertes d'échappement de la turbine BP augmentent, puis l'écoulement se bloque.` + (I ? ` La position de cet optimum reste incertaine (${fr(I.T_opt_q[0])} à ${fr(I.T_opt_q[2])} °C) : elle dépend de la taille de la dernière ailette.` : ""),
+    `Le mécanisme dominant est thermodynamique. La relation de Clapeyron (<a class="ref" data-ref="eq-clap"></a>) prévoit ${fr(d.clapeyron, 1)} MW/K, et le crédit de régénération (<a class="ref" data-ref="eq-credit"></a>) en compense ${fr(d.credit_regeneratif, 1)}. L'estimation à la main retrouve le modèle à ${fr(100 * Math.abs(d.residu_autres_effets / d.modele_sans_pertes), 1)} % près.`,
+    `Le réchauffage de l'eau alimentaire élève la température moyenne d'apport de chaleur de ${fr(b.T_moyenne_apport_C)} à ${fr(a.T_moyenne_apport_C)} °C. C'est l'origine des ${fr(100 * (a.rendement_cycle - b.rendement_cycle), 1)} points de rendement gagnés sur le cycle simple.`,
+    `En exergie, la turbine BP est le premier poste de destruction, devant le générateur de vapeur. Le condenseur, dominant dans le bilan d'énergie, détruit peu d'exergie.`,
+  ];
+  if (cz) items.push(`Sur la météo réelle 2015-2024, une tranche de Chooz produirait ${fr(cz.energie_moyenne_TWh, 2)} TWh/an à pleine puissance, avec ${fr((cz.mensuel.P[0] + cz.mensuel.P[11]) / 2 - (cz.mensuel.P[6] + cz.mensuel.P[7]) / 2)} MWe de moins en été qu'en hiver. Un réchauffement de 2 °C retirerait ${fr(1000 * (cz.energie_moyenne_TWh - c2.energie_moyenne_TWh))} GWh/an (${fr(100 * (1 - c2.energie_moyenne_TWh / cz.energie_moyenne_TWh), 1)} %). En circuit ouvert, les limites de rejet pèseraient bien davantage que la perte de rendement (<a class="ref" data-ref="fig-rej"></a>).`);
+  $("conclusions").innerHTML = items.map((t) => `<li>${t}</li>`).join("");
+})();
+
+/* ================= NUMÉROTATION ET RENVOIS ================= */
+(function numeroter() {
+  const lab = {};
+  let nf = 0, nt = 0, ne = 0;
+  document.querySelectorAll("main figure.fig").forEach((f) => { nf++; lab[f.id] = `figure ${nf}`; const c = f.querySelector(":scope > figcaption"); if (c) c.insertAdjacentHTML("afterbegin", `<b>Figure ${nf}.</b> `); });
+  document.querySelectorAll("main table.numtab").forEach((t) => { nt++; lab[t.id] = `tableau ${nt}`; const cap = document.createElement("caption"); cap.innerHTML = `<b>Tableau ${nt}.</b> ${esc(t.dataset.caption || "")}`; t.prepend(cap); });
+  document.querySelectorAll("main .eq").forEach((e) => { ne++; lab[e.id] = `équation (${ne})`; e.querySelector(".eqn").textContent = `(${ne})`; });
+  document.querySelectorAll("#hyp tr[id]").forEach((r) => { lab[r.id] = r.dataset.h; });
+  document.querySelectorAll("a.ref").forEach((a) => { const id = a.dataset.ref; a.href = `#${id}`; a.textContent = lab[id] || id; });
 })();
 
 </script>

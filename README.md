@@ -37,15 +37,17 @@ python scripts/figures_rapport.py     # toutes les études et figures, ~8 min
 python scripts/rapport_html.py        # rapport interactif
 ```
 
-Ouvrir ensuite **`results/rapport.html`** dans un navigateur. Le rapport a quatre onglets :
-**Étude** (résultats interactifs), **Thermodynamique** (démonstrations à la main),
-**Code** (sources commentées) et **Démarche** (carnet de bord des choix et corrections).
-L'onglet Étude contient :
-- un curseur de température d'eau, qui met à jour les valeurs et déplace un repère sur les graphiques ;
-- le schéma du circuit, le diagramme T-s, le Sankey et le bilan d'exergie ;
-- la carte jour par jour sur dix ans ;
-- la carte des limites de rejet ;
-- les bandes d'incertitude et la tornade.
+Ouvrir ensuite **`results/rapport.html`** dans un navigateur. C'est un rapport d'étude
+interactif, au plan classique d'un rapport d'ingénierie :
+
+- page de garde, résumé et mots-clés, nomenclature ;
+- 1. Introduction · 2. Installation étudiée · 3. Modélisation (hypothèses H1 à H11, équations numérotées) · 4. Vérification et validation · 5. Résultats · 6. Analyse et discussion · 7. Conclusions et perspectives ;
+- références ;
+- annexes : A. états thermodynamiques, B. code source, C. journal de développement.
+
+Les figures, tableaux et équations sont numérotés automatiquement, et les renvois du
+texte pointent vers eux. Les figures restent interactives : curseur de température,
+schéma cliquable, calculateur météo, limites de rejet réglables.
 
 Avec `--cache`, `figures_rapport.py` réutilise les balayages déjà calculés.
 
