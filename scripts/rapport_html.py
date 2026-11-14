@@ -30,7 +30,9 @@ def main() -> None:
     corps = gabarit.replace(marque, donnees)
     # Le gabarit est un fragment (format des pages publiées) : on l'enveloppe
     # d'un squelette HTML complet pour l'ouvrir directement dans un navigateur.
-    SORTIE.write_text(ENTETE + corps.replace("<div class=\"wrap\">", "</head>\n<body>\n<div class=\"wrap\">", 1)
+    debut_corps = '<header class="hero">'
+    assert debut_corps in corps, "début du corps de page introuvable dans le gabarit"
+    SORTIE.write_text(ENTETE + corps.replace(debut_corps, "</head>\n<body>\n" + debut_corps, 1)
                       + "\n</body>\n</html>\n", encoding="utf-8")
     fragment = RACINE / "results" / "rapport_fragment.html"
     fragment.write_text(corps, encoding="utf-8")

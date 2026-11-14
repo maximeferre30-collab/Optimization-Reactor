@@ -105,7 +105,7 @@ def main() -> None:
 
     # 3) Tour + météo réelle
     courbes = CourbesCentrale.depuis_balayage(df)
-    annuel, carte = {}, None
+    annuel, carte, cartes, tables = {}, None, {}, {}
     for site in ("chooz", "civaux"):
         f = DATA / f"meteo_{site}.csv"
         if not f.exists():
@@ -113,14 +113,18 @@ def main() -> None:
             continue
         meteo = pd.read_csv(f, parse_dates=["temps_utc"])
         tab = table_tour(TourNaturelle(ConceptionTour()), courbes, meteo["P_hPa"].mean() * 100)
+        tables[site] = {"T": _liste(tab.grid[0]), "HR": _liste(tab.grid[1]),
+                        "Z": [[round(float(v), 3) for v in ligne] for ligne in tab.values]}
         P_ref = float(df.loc[15.0, "puissance_electrique_nette_MW"])
         for dT in (0.0, 2.0):
             prod = production(meteo, tab, courbes, dT)
             s = synthese(prod, P_ref)
             s["T_eau_froide_moy_C"] = float(prod["T_eau_froide_C"].mean())
             annuel[f"{site}{'_+2' if dT else ''}"] = s
-            if site == "chooz" and dT == 0:
-                carte = carte_journaliere(prod)
+            if dT == 0:
+                cartes[site] = carte_journaliere(prod)
+                if site == "chooz":
+                    carte = cartes[site]
     if annuel:
         fig_mensuel({
             "Chooz": (annuel["chooz"], BLEU, "-"),
@@ -154,7 +158,25 @@ def main() -> None:
     fig_echappement(df, pN4.vitesse_annulaire_blocage_m_s, RES / "fig4_pertes_echappement.png")
     fig_exergie(bex, RES / "fig5_exergie.png")
 
-    # 7) Données du rapport interactif
+    # 7) Détail par composant (schéma interactif)
+    from rep_secondaire.exergie import _sgen
+    T0 = n4.c["11"].T.val_SI
+    composants = {}
+    for nom, k in n4.K.items():
+        d = {"ExD_MW": T0 * _sgen(k) / 1e6 if nom not in ("prim_in", "prim_out", "cw_in", "cw_out") else 0.0}
+        for attr in ("P", "Q"):
+            par = getattr(k, attr, None)
+            if par is not None and getattr(par, "val", None) is not None:
+                try:
+                    d[f"{attr}_MW"] = float(par.val)
+                except (TypeError, ValueError):
+                    pass
+        d["entrees"] = [[c.label, round(c.T.val, 2), round(c.p.val, 4), round(c.m.val, 2)] for c in k.inl]
+        d["sorties"] = [[c.label, round(c.T.val, 2), round(c.p.val, 4), round(c.m.val, 2)] for c in k.outl]
+        composants[nom] = d
+    debits = {lbl: round(float(c.m.val), 2) for lbl, c in n4.c.items()}
+
+    # 8) Données du rapport interactif
     cols = ["p_condenseur_mbar", "T_condenseur_C", "T_sortie_eau_refroidissement_C",
             "vitesse_annulaire_m_s", "echappement_bloque", "perte_echappement_MW",
             "debit_vapeur_kg_s", "puissance_electrique_nette_MW", "rendement_net",
@@ -196,6 +218,12 @@ def main() -> None:
         "rejets": {"T": _liste(T_riv), "Q": _liste(Q_riv, d=1), "P": [[round(float(v), 1) for v in l] for l in P_adm],
                    "limites": asdict(lim)},
         "incertitudes": st,
+        "composants": composants,
+        "debits": debits,
+        "tables_tour": tables,
+        "cartes": {site: {"annees": [int(a) for a in c.index],
+                          "valeurs": [[None if pd.isna(v) else round(float(v), 1) for v in ligne]
+                                      for ligne in c.values]} for site, c in cartes.items()},
         "tour": asdict(ConceptionTour()),
     }
     (RES / "rapport_donnees.json").write_text(json.dumps(donnees, ensure_ascii=False), encoding="utf-8")
