@@ -29,6 +29,9 @@ def main() -> None:
     print(f"Pression condenseur           : {r.p_condenseur_mbar:8.1f} mbar")
     print(f"Température de condensation   : {r.T_condenseur_C:8.1f} °C")
     print(f"Titre en sortie turbine       : {r.titre_sortie_turbine:8.3f}")
+    print(f"Vitesse annulaire échappement : {r.vitesse_annulaire_m_s:8.1f} m/s "
+          f"(section {modele.section_annulaire_m2:.0f} m²)")
+    print(f"Perte d'échappement BP        : {r.perte_echappement_MW:8.1f} MW")
     print(f"Puissance thermique GV        : {r.puissance_thermique_MW:8.1f} MW")
     print(f"Puissance mécanique turbine   : {r.puissance_turbine_MW:8.1f} MW")
     print(f"Puissance pompe alimentaire   : {r.puissance_pompe_MW:8.1f} MW")

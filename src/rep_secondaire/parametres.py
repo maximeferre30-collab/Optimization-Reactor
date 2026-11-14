@@ -36,6 +36,20 @@ class ParametresRankine:
     on serait plutôt vers 0,80-0,85 (règle de Baumann : ~1 % de perte par %
     d'humidité)."""
 
+    pertes_echappement: bool = True
+    """Prise en compte des pertes d'échappement BP (méthode SCC, voir
+    echappement.py). False = turbine « idéale » de l'étape 1."""
+
+    vitesse_annulaire_design_m_s: float = 250.0
+    """Vitesse axiale de sortie au point de design. Elle fixe la section
+    annulaire de sortie BP, qui reste ensuite constante en offdesign. Les
+    constructeurs visent typiquement 200-300 m/s. On ne prend pas la section
+    réelle d'Arabelle, car notre cycle sans soutirage envoie beaucoup plus de
+    vapeur au condenseur que la vraie machine."""
+
+    vitesse_annulaire_blocage_m_s: float = 400.0
+    """Vitesse de blocage (ordre de grandeur des courbes SCC)."""
+
     rendement_meca_alternateur: float = 0.985
     """Rendement combiné mécanique (paliers) x alternateur."""
 

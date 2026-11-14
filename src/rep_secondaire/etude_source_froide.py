@@ -14,7 +14,7 @@ partant du précédent.
 
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import numpy as np
@@ -40,7 +40,9 @@ def balayage_temperature(
 
     Retourne un DataFrame indexé par la température d'entrée (°C).
     """
-    params = params or ParametresRankine()
+    # Copie : resoudre_offdesign() modifie les paramètres du modèle, il ne
+    # faut pas altérer l'objet de l'appelant.
+    params = replace(params) if params else ParametresRankine()
     T_ref = params.T_eau_refroidissement_C
 
     modele = RankineSimple(params)
@@ -68,7 +70,21 @@ def balayage_temperature(
     return df
 
 
-def sensibilite(df: pd.DataFrame, colonne: str = "puissance_electrique_nette_MW"):
-    """Pente moyenne (régression linéaire) de la colonne en fonction de T."""
-    pente, _ = np.polyfit(df.index.values, df[colonne].values, 1)
+def sensibilite(
+    df: pd.DataFrame,
+    colonne: str = "puissance_electrique_nette_MW",
+    T_min: float | None = None,
+    T_max: float | None = None,
+):
+    """Pente moyenne (régression linéaire) de la colonne en fonction de T,
+    éventuellement restreinte à [T_min, T_max]."""
+    d = df.loc[(T_min if T_min is not None else -np.inf):
+               (T_max if T_max is not None else np.inf)]
+    pente, _ = np.polyfit(d.index.values, d[colonne].values, 1)
     return pente
+
+
+def optimum(df: pd.DataFrame, colonne: str = "puissance_electrique_nette_MW"):
+    """Température d'eau donnant la puissance maximale, et cette puissance."""
+    T = df[colonne].idxmax()
+    return T, df.loc[T, colonne]
